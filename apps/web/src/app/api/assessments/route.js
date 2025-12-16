@@ -1,4 +1,4 @@
-import sql from "@/app/api/utils/sql";
+import { getDb } from "@/app/api/utils/mongodb";
 import { auth } from "@/auth";
 
 export async function POST(request) {
@@ -18,6 +18,8 @@ export async function POST(request) {
       );
     }
 
+    const db = await getDb();
+
     // Calculate scores for each dimension
     const dimensions = [
       "Spiritual",
@@ -26,18 +28,15 @@ export async function POST(request) {
       "Educational",
       "Financial",
     ];
-    const scores = {};
 
     // Get all questions to know which are reverse-coded
-    const questions = await sql`
-      SELECT id, dimension, is_reverse_coded
-      FROM questions
-      WHERE is_active = true
-    `;
+    const questions = await db.collection('questions')
+      .find({ is_active: true })
+      .toArray();
 
     const questionMap = {};
     questions.forEach((q) => {
-      questionMap[q.id] = {
+      questionMap[q._id.toString()] = {
         dimension: q.dimension,
         isReverseCoded: q.is_reverse_coded,
       };
@@ -54,7 +53,7 @@ export async function POST(request) {
 
     // Calculate raw scores
     Object.entries(responses).forEach(([questionId, response]) => {
-      const question = questionMap[parseInt(questionId)];
+      const question = questionMap[questionId];
       if (question && response >= 1 && response <= 5) {
         const score = question.isReverseCoded ? 6 - response : response;
         dimensionScores[question.dimension].raw += score;
@@ -73,7 +72,7 @@ export async function POST(request) {
       }
     });
 
-    // Calculate overall score (average of all dimensions)
+    // Calculate overall score
     const overallScore = Math.round(
       (normalizedScores.Spiritual +
         normalizedScores.Physical +
@@ -83,46 +82,27 @@ export async function POST(request) {
         5,
     );
 
-    // Insert assessment into database
-    const result = await sql`
-      INSERT INTO assessments (
-        user_id,
-        overall_score,
-        spiritual_score,
-        physical_score,
-        mental_score,
-        educational_score,
-        financial_score,
-        responses
-      ) VALUES (
-        ${session.user.id},
-        ${overallScore},
-        ${normalizedScores.Spiritual},
-        ${normalizedScores.Physical},
-        ${normalizedScores.Mental},
-        ${normalizedScores.Educational},
-        ${normalizedScores.Financial},
-        ${JSON.stringify(responses)}
-      )
-      RETURNING id, overall_score, spiritual_score, physical_score, 
-                mental_score, educational_score, financial_score, completed_at
-    `;
-
-    const assessment = result[0];
+    // Insert assessment into MongoDB
+    const now = new Date();
+    const result = await db.collection('assessments').insertOne({
+      user_id: session.user.id,
+      overall_score: overallScore,
+      spiritual_score: normalizedScores.Spiritual,
+      physical_score: normalizedScores.Physical,
+      mental_score: normalizedScores.Mental,
+      educational_score: normalizedScores.Educational,
+      financial_score: normalizedScores.Financial,
+      responses: responses,
+      completed_at: now,
+    });
 
     return Response.json({
       success: true,
       assessment: {
-        id: assessment.id,
-        overallScore: assessment.overall_score,
-        scores: {
-          Spiritual: assessment.spiritual_score,
-          Physical: assessment.physical_score,
-          Mental: assessment.mental_score,
-          Educational: assessment.educational_score,
-          Financial: assessment.financial_score,
-        },
-        completedAt: assessment.completed_at,
+        id: result.insertedId.toString(),
+        overallScore: overallScore,
+        scores: normalizedScores,
+        completedAt: now,
       },
     });
   } catch (error) {
@@ -141,23 +121,14 @@ export async function GET() {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const assessments = await sql`
-      SELECT 
-        id,
-        overall_score,
-        spiritual_score,
-        physical_score,
-        mental_score,
-        educational_score,
-        financial_score,
-        completed_at
-      FROM assessments
-      WHERE user_id = ${session.user.id}
-      ORDER BY completed_at DESC
-    `;
+    const db = await getDb();
+    const assessments = await db.collection('assessments')
+      .find({ user_id: session.user.id })
+      .sort({ completed_at: -1 })
+      .toArray();
 
     const formattedAssessments = assessments.map((a) => ({
-      id: a.id,
+      id: a._id.toString(),
       overallScore: a.overall_score,
       scores: {
         Spiritual: a.spiritual_score,

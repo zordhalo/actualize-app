@@ -99,9 +99,23 @@ if (process.env.AUTH_SECRET) {
         strategy: 'jwt',
       },
       callbacks: {
+        jwt({ token, user }) {
+          if (user) {
+            token.sub = user.id;
+            token.email = user.email;
+            token.name = user.name;
+          }
+          return token;
+        },
         session({ session, token }) {
           if (token.sub) {
             session.user.id = token.sub;
+          }
+          if (token.email) {
+            session.user.email = token.email as string;
+          }
+          if (token.name) {
+            session.user.name = token.name as string;
           }
           return session;
         },
@@ -149,26 +163,40 @@ if (process.env.AUTH_SECRET) {
               return null;
             }
 
-            // logic to verify if user exists
-            const user = await adapter.getUserByEmail(email);
-            if (!user) {
-              return null;
-            }
-            const matchingAccount = user.accounts.find(
-              (account) => account.provider === 'credentials'
-            );
-            const accountPassword = matchingAccount?.password;
-            if (!accountPassword) {
-              return null;
+            // MOCK AUTH: Test user for development (no database required)
+            if (email === 'test@test.ca' && password === '1234') {
+              return {
+                id: 'test-user-id-123',
+                email: 'test@test.ca',
+                name: 'Test User',
+                emailVerified: null,
+              };
             }
 
-            const isValid = await verify(accountPassword, password);
-            if (!isValid) {
+            // Real database auth
+            try {
+              const user = await adapter.getUserByEmail(email);
+              if (!user) {
+                return null;
+              }
+              const matchingAccount = user.accounts.find(
+                (account) => account.provider === 'credentials'
+              );
+              const accountPassword = matchingAccount?.password;
+              if (!accountPassword) {
+                return null;
+              }
+
+              const isValid = await verify(accountPassword, password);
+              if (!isValid) {
+                return null;
+              }
+
+              return user;
+            } catch (error) {
+              console.error('Database auth failed:', error);
               return null;
             }
-
-            // return user object with the their profile data
-            return user;
           },
         }),
         Credentials({
@@ -195,28 +223,43 @@ if (process.env.AUTH_SECRET) {
               return null;
             }
 
-            // logic to verify if user exists
-            const user = await adapter.getUserByEmail(email);
-            if (!user) {
-              const newUser = await adapter.createUser({
-                id: crypto.randomUUID(),
+            // MOCK AUTH: Test user for development (no database required)
+            if (email === 'test@test.ca' && password === '1234') {
+              return {
+                id: 'test-user-id-123',
+                email: 'test@test.ca',
+                name: typeof name === 'string' && name.length > 0 ? name : 'Test User',
                 emailVerified: null,
-                email,
-                name: typeof name === 'string' && name.length > 0 ? name : undefined,
-                image: typeof image === 'string' && image.length > 0 ? image : undefined,
-              });
-              await adapter.linkAccount({
-                extraData: {
-                  password: await hash(password),
-                },
-                type: 'credentials',
-                userId: newUser.id,
-                providerAccountId: newUser.id,
-                provider: 'credentials',
-              });
-              return newUser;
+              };
             }
-            return null;
+
+            // Real database auth
+            try {
+              const user = await adapter.getUserByEmail(email);
+              if (!user) {
+                const newUser = await adapter.createUser({
+                  id: crypto.randomUUID(),
+                  emailVerified: null,
+                  email,
+                  name: typeof name === 'string' && name.length > 0 ? name : undefined,
+                  image: typeof image === 'string' && image.length > 0 ? image : undefined,
+                });
+                await adapter.linkAccount({
+                  extraData: {
+                    password: await hash(password),
+                  },
+                  type: 'credentials',
+                  userId: newUser.id,
+                  providerAccountId: newUser.id,
+                  provider: 'credentials',
+                });
+                return newUser;
+              }
+              return null;
+            } catch (error) {
+              console.error('Database signup failed:', error);
+              return null;
+            }
           },
         }),
       ],

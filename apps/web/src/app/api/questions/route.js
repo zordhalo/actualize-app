@@ -1,13 +1,12 @@
-import sql from "@/app/api/utils/sql";
+import { getDb } from "@/app/api/utils/mongodb";
 
 export async function GET() {
   try {
-    const questions = await sql`
-      SELECT id, dimension, question_text, is_reverse_coded, order_index
-      FROM questions
-      WHERE is_active = true
-      ORDER BY dimension, order_index
-    `;
+    const db = await getDb();
+    const questions = await db.collection('questions')
+      .find({ is_active: true })
+      .sort({ dimension: 1, order_index: 1 })
+      .toArray();
 
     // Group questions by dimension
     const grouped = {
@@ -21,7 +20,7 @@ export async function GET() {
     questions.forEach((q) => {
       if (grouped[q.dimension]) {
         grouped[q.dimension].push({
-          id: q.id,
+          id: q._id.toString(),
           text: q.question_text,
           isReverseCoded: q.is_reverse_coded,
           order: q.order_index,
