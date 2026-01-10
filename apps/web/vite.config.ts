@@ -82,6 +82,32 @@ export default defineConfig({
   ssr: {
     // Force Vite to bundle CommonJS modules that don't work well with ESM
     noExternal: ['react-idle-timer'],
+    // Externalize Hono and related packages for SSR build
+    external: [
+      'hono',
+      'hono/cors',
+      'hono/proxy',
+      'hono/body-limit',
+      'hono/request-id',
+      'hono/context-storage',
+      'hono/vercel',
+      '@hono/auth-js',
+      '@hono/auth-js/react',
+    ],
+  },
+  build: {
+    rollupOptions: {
+      external: [
+        'hono',
+        'hono/cors',
+        'hono/proxy',
+        'hono/body-limit',
+        'hono/request-id',
+        'hono/context-storage',
+        'hono/vercel',
+        '@hono/auth-js',
+      ],
+    },
   },
   server: {
     allowedHosts: true,
