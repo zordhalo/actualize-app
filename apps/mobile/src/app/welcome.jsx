@@ -2,29 +2,15 @@ import React from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  useFonts,
-  Montserrat_500Medium,
-  Montserrat_600SemiBold,
-} from "@expo-google-fonts/montserrat";
 import { ArrowRight } from "lucide-react-native";
 import { router } from "expo-router";
-import { useAppTheme } from "@/utils/theme";
+import { useAppTheme, fonts } from "@/utils/theme";
 import { useAuth } from "@/utils/auth/useAuth";
 
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
   const { signIn, signUp } = useAuth();
-
-  const [fontsLoaded] = useFonts({
-    Montserrat_500Medium,
-    Montserrat_600SemiBold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -39,21 +25,36 @@ export default function WelcomeScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
+        {/* Brand Logo - Display Font */}
         <Text
           style={{
-            fontSize: 40,
-            fontFamily: "Montserrat_600SemiBold",
-            color: colors.primary,
-            marginBottom: 16,
+            fontSize: 48,
+            fontFamily: fonts.display.bold,
+            color: colors.actualize,
+            marginBottom: 8,
+            textTransform: "uppercase",
+            letterSpacing: 2,
           }}
         >
           Actualize
         </Text>
 
+        {/* Script Tagline */}
+        <Text
+          style={{
+            fontSize: 24,
+            fontFamily: fonts.script.regular,
+            color: colors.primary,
+            marginBottom: 16,
+          }}
+        >
+          Energy Over Everything
+        </Text>
+
         <Text
           style={{
             fontSize: 18,
-            fontFamily: "Montserrat_500Medium",
+            fontFamily: fonts.body.medium,
             color: colors.secondary,
             lineHeight: 28,
             marginBottom: 40,
@@ -63,8 +64,16 @@ export default function WelcomeScreen() {
           life.
         </Text>
 
+        {/* Feature Cards */}
         <View style={{ marginBottom: 40 }}>
-          <View style={{ marginBottom: 24 }}>
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: 20,
+              padding: 20,
+              marginBottom: 16,
+            }}
+          >
             <View
               style={{
                 width: 48,
@@ -80,10 +89,12 @@ export default function WelcomeScreen() {
             </View>
             <Text
               style={{
-                fontSize: 16,
-                fontFamily: "Montserrat_600SemiBold",
+                fontSize: 18,
+                fontFamily: fonts.display.semiBold,
                 color: colors.primary,
                 marginBottom: 8,
+                textTransform: "uppercase",
+                letterSpacing: 1,
               }}
             >
               Comprehensive Assessment
@@ -91,7 +102,7 @@ export default function WelcomeScreen() {
             <Text
               style={{
                 fontSize: 14,
-                fontFamily: "Montserrat_500Medium",
+                fontFamily: fonts.body.regular,
                 color: colors.secondary,
                 lineHeight: 22,
               }}
@@ -101,7 +112,14 @@ export default function WelcomeScreen() {
             </Text>
           </View>
 
-          <View style={{ marginBottom: 24 }}>
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: 20,
+              padding: 20,
+              marginBottom: 16,
+            }}
+          >
             <View
               style={{
                 width: 48,
@@ -117,10 +135,12 @@ export default function WelcomeScreen() {
             </View>
             <Text
               style={{
-                fontSize: 16,
-                fontFamily: "Montserrat_600SemiBold",
+                fontSize: 18,
+                fontFamily: fonts.display.semiBold,
                 color: colors.primary,
                 marginBottom: 8,
+                textTransform: "uppercase",
+                letterSpacing: 1,
               }}
             >
               Track Your Progress
@@ -128,7 +148,7 @@ export default function WelcomeScreen() {
             <Text
               style={{
                 fontSize: 14,
-                fontFamily: "Montserrat_500Medium",
+                fontFamily: fonts.body.regular,
                 color: colors.secondary,
                 lineHeight: 22,
               }}
@@ -137,7 +157,13 @@ export default function WelcomeScreen() {
             </Text>
           </View>
 
-          <View>
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: 20,
+              padding: 20,
+            }}
+          >
             <View
               style={{
                 width: 48,
@@ -153,10 +179,12 @@ export default function WelcomeScreen() {
             </View>
             <Text
               style={{
-                fontSize: 16,
-                fontFamily: "Montserrat_600SemiBold",
+                fontSize: 18,
+                fontFamily: fonts.display.semiBold,
                 color: colors.primary,
                 marginBottom: 8,
+                textTransform: "uppercase",
+                letterSpacing: 1,
               }}
             >
               Actionable Recommendations
@@ -164,16 +192,20 @@ export default function WelcomeScreen() {
             <Text
               style={{
                 fontSize: 14,
-                fontFamily: "Montserrat_500Medium",
+                fontFamily: fonts.body.regular,
                 color: colors.secondary,
                 lineHeight: 22,
               }}
             >
-              Get personalized tips to improve in each dimension
+              Get personalized tips to improve{" "}
+              <Text style={{ color: colors.lime, fontFamily: fonts.body.bold }}>
+                (IN ALL AREAS OF LIFE)
+              </Text>
             </Text>
           </View>
         </View>
 
+        {/* CTA Buttons */}
         <TouchableOpacity
           style={{
             backgroundColor: colors.actualize,
@@ -189,9 +221,11 @@ export default function WelcomeScreen() {
           <Text
             style={{
               fontSize: 16,
-              fontFamily: "Montserrat_600SemiBold",
+              fontFamily: fonts.display.semiBold,
               color: "#FFFFFF",
               marginRight: 8,
+              textTransform: "uppercase",
+              letterSpacing: 1,
             }}
           >
             Create Account
@@ -213,7 +247,7 @@ export default function WelcomeScreen() {
           <Text
             style={{
               fontSize: 16,
-              fontFamily: "Montserrat_600SemiBold",
+              fontFamily: fonts.body.semiBold,
               color: colors.primary,
             }}
           >

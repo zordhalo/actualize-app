@@ -8,15 +8,9 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  useFonts,
-  Montserrat_400Regular,
-  Montserrat_500Medium,
-  Montserrat_600SemiBold,
-} from "@expo-google-fonts/montserrat";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { router } from "expo-router";
-import { useAppTheme } from "@/utils/theme";
+import { useAppTheme, fonts } from "@/utils/theme";
 
 export default function AssessmentScreen() {
   const insets = useSafeAreaInsets();
@@ -26,12 +20,6 @@ export default function AssessmentScreen() {
   const [allQuestions, setAllQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState({});
-
-  const [fontsLoaded] = useFonts({
-    Montserrat_400Regular,
-    Montserrat_500Medium,
-    Montserrat_600SemiBold,
-  });
 
   useEffect(() => {
     fetchQuestions();
@@ -140,7 +128,7 @@ export default function AssessmentScreen() {
     return dimColors[dimension] || colors.actualize;
   };
 
-  if (!fontsLoaded || loading) {
+  if (loading) {
     return (
       <View
         style={{
@@ -169,7 +157,7 @@ export default function AssessmentScreen() {
         <Text
           style={{
             fontSize: 16,
-            fontFamily: "Montserrat_500Medium",
+            fontFamily: fonts.body.medium,
             color: colors.secondary,
             textAlign: "center",
           }}
@@ -213,8 +201,10 @@ export default function AssessmentScreen() {
           <Text
             style={{
               fontSize: 14,
-              fontFamily: "Montserrat_600SemiBold",
+              fontFamily: fonts.display.semiBold,
               color: colors.secondary,
+              textTransform: "uppercase",
+              letterSpacing: 1,
             }}
           >
             {currentQuestionIndex + 1} / {allQuestions.length}
@@ -274,8 +264,10 @@ export default function AssessmentScreen() {
           <Text
             style={{
               fontSize: 16,
-              fontFamily: "Montserrat_600SemiBold",
+              fontFamily: fonts.display.semiBold,
               color: getDimensionColor(currentQuestion.dimension),
+              textTransform: "uppercase",
+              letterSpacing: 1,
             }}
           >
             {currentQuestion.dimension}
@@ -285,7 +277,7 @@ export default function AssessmentScreen() {
         <Text
           style={{
             fontSize: 24,
-            fontFamily: "Montserrat_600SemiBold",
+            fontFamily: fonts.display.semiBold,
             color: colors.primary,
             lineHeight: 34,
             marginBottom: 40,
@@ -305,7 +297,7 @@ export default function AssessmentScreen() {
             <Text
               style={{
                 fontSize: 12,
-                fontFamily: "Montserrat_500Medium",
+                fontFamily: fonts.body.medium,
                 color: colors.secondary,
               }}
             >
@@ -314,7 +306,7 @@ export default function AssessmentScreen() {
             <Text
               style={{
                 fontSize: 12,
-                fontFamily: "Montserrat_500Medium",
+                fontFamily: fonts.body.medium,
                 color: colors.secondary,
               }}
             >
@@ -349,7 +341,7 @@ export default function AssessmentScreen() {
                 <Text
                   style={{
                     fontSize: 24,
-                    fontFamily: "Montserrat_600SemiBold",
+                    fontFamily: fonts.display.bold,
                     color:
                       responses[currentQuestion.id] === rating
                         ? "#FFFFFF"
@@ -367,8 +359,8 @@ export default function AssessmentScreen() {
           <Text
             style={{
               fontSize: 13,
-              fontFamily: "Montserrat_500Medium",
-              color: colors.secondary,
+              fontFamily: fonts.body.medium,
+              color: colors.lime,
               textAlign: "center",
               marginTop: 8,
             }}
@@ -421,12 +413,14 @@ export default function AssessmentScreen() {
             <Text
               style={{
                 fontSize: 15,
-                fontFamily: "Montserrat_600SemiBold",
+                fontFamily: fonts.display.semiBold,
                 color:
                   currentQuestionIndex === 0
                     ? colors.secondary
                     : colors.primary,
                 marginLeft: 4,
+                textTransform: "uppercase",
+                letterSpacing: 1,
               }}
             >
               Previous
@@ -453,9 +447,11 @@ export default function AssessmentScreen() {
               <Text
                 style={{
                   fontSize: 15,
-                  fontFamily: "Montserrat_600SemiBold",
+                  fontFamily: fonts.display.semiBold,
                   color: isAnswered ? "#FFFFFF" : colors.secondary,
                   marginRight: 4,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
                 }}
               >
                 Next
@@ -488,8 +484,10 @@ export default function AssessmentScreen() {
                 <Text
                   style={{
                     fontSize: 15,
-                    fontFamily: "Montserrat_600SemiBold",
+                    fontFamily: fonts.display.semiBold,
                     color: allAnswered ? "#FFFFFF" : colors.secondary,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
                   }}
                 >
                   Complete

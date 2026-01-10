@@ -93,24 +93,24 @@ function AssessmentContent() {
 
   const getDimensionColor = (dimension) => {
     const colors = {
-      Spiritual: "#a855f7", Physical: "#ef4444", Mental: "#3b82f6",
-      Educational: "#22c55e", Financial: "#eab308",
+      Spiritual: "#9b87f5", Physical: "#22c55e", Mental: "#3b82f6",
+      Educational: "#f59e0b", Financial: "#d4af37",
     };
-    return colors[dimension] || "#d90428";
+    return colors[dimension] || "#CC0000";
   };
 
   if (loading || status === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
-        <div className="w-8 h-8 border-4 border-[#d90428] border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-brand-black">
+        <div className="w-8 h-8 border-4 border-brand-red border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (allQuestions.length === 0) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] p-5">
-        <p className="text-base text-[#999] text-center font-montserrat">
+      <div className="flex min-h-screen items-center justify-center bg-brand-black p-5">
+        <p className="text-base text-[#999] text-center font-body">
           No questions available. Please try again later.
         </p>
       </div>
@@ -123,23 +123,24 @@ function AssessmentContent() {
   const allAnswered = Object.keys(responses).length === allQuestions.length;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
+    <div className="min-h-screen bg-brand-black text-brand-white flex flex-col">
       {/* Header */}
       <div className="px-5 pt-6 pb-4">
         <div className="flex justify-between items-center mb-3">
           <button
             onClick={() => navigate(-1)}
-            className="text-white hover:text-[#999] transition-colors text-xl"
+            className="text-brand-white hover:text-[#999] transition-colors text-xl"
           >
             ←
           </button>
-          <span className="text-sm font-semibold text-[#999] font-montserrat">
+          <span className="text-sm font-display font-semibold text-[#999] uppercase tracking-wide">
             {currentQuestionIndex + 1} / {allQuestions.length}
           </span>
         </div>
-        <div className="h-1 bg-[#333] rounded-full overflow-hidden">
+        {/* Progress bar */}
+        <div className="h-1 bg-surface-light rounded-full overflow-hidden">
           <div
-            className="h-full bg-[#d90428] rounded-full transition-all duration-300"
+            className="h-full bg-brand-red rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -147,6 +148,7 @@ function AssessmentContent() {
 
       {/* Content */}
       <div className="flex-1 px-5 pb-32">
+        {/* Dimension badge */}
         <div className="flex items-center mb-6 gap-3">
           <div
             className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
@@ -155,31 +157,33 @@ function AssessmentContent() {
             {getDimensionIcon(currentQuestion.dimension)}
           </div>
           <span
-            className="text-base font-semibold font-montserrat"
+            className="text-base font-display font-semibold uppercase tracking-wide"
             style={{ color: getDimensionColor(currentQuestion.dimension) }}
           >
             {currentQuestion.dimension}
           </span>
         </div>
 
-        <h2 className="text-2xl font-semibold text-white leading-9 mb-10 font-montserrat">
+        {/* Question text */}
+        <h2 className="text-2xl font-display font-semibold text-brand-white leading-9 mb-10">
           {currentQuestion.text}
         </h2>
 
+        {/* Rating buttons */}
         <div className="mb-8 md:max-w-lg md:mx-auto">
           <div className="flex justify-between mb-3">
-            <span className="text-xs text-[#999] font-montserrat">Strongly Disagree</span>
-            <span className="text-xs text-[#999] font-montserrat">Strongly Agree</span>
+            <span className="text-xs text-[#999] font-body">Strongly Disagree</span>
+            <span className="text-xs text-[#999] font-body">Strongly Agree</span>
           </div>
           <div className="flex justify-between md:justify-center md:gap-6 gap-2">
             {[1, 2, 3, 4, 5].map((rating) => (
               <button
                 key={rating}
                 onClick={() => handleResponse(rating)}
-                className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-semibold transition-all font-montserrat ${
+                className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-display font-bold transition-all ${
                   responses[currentQuestion.id] === rating
-                    ? "bg-[#d90428] text-white border-2 border-[#d90428]"
-                    : "bg-[#1a1a1a] text-white border-2 border-[#333] hover:border-[#555]"
+                    ? "bg-brand-red text-brand-white border-2 border-brand-red"
+                    : "bg-surface text-brand-white border-2 border-surface-light hover:border-brand-lime"
                 }`}
               >
                 {rating}
@@ -189,22 +193,22 @@ function AssessmentContent() {
         </div>
 
         {isAnswered && (
-          <p className="text-sm text-[#999] text-center font-montserrat">
+          <p className="text-sm text-brand-lime text-center font-body">
             ✓ Answer recorded
           </p>
         )}
       </div>
 
       {/* Footer Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#333] px-5 py-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-surface border-t border-surface-light px-5 py-4">
         <div className="max-w-xl mx-auto flex gap-3">
           <button
             onClick={handlePrevious}
             disabled={currentQuestionIndex === 0}
-            className={`flex-1 py-4 rounded-xl font-semibold text-base flex items-center justify-center gap-1 font-montserrat ${
+            className={`flex-1 py-4 rounded-xl font-display font-semibold text-base flex items-center justify-center gap-1 uppercase tracking-wide ${
               currentQuestionIndex === 0
-                ? "bg-[#222] text-[#666] cursor-not-allowed"
-                : "bg-[#1a1a1a] border border-[#333] text-white hover:bg-[#222]"
+                ? "bg-surface-light text-[#666] cursor-not-allowed"
+                : "bg-surface border border-surface-light text-brand-white hover:bg-surface-light"
             }`}
           >
             ← Previous
@@ -214,10 +218,10 @@ function AssessmentContent() {
             <button
               onClick={handleNext}
               disabled={!isAnswered}
-              className={`flex-1 py-4 rounded-xl font-semibold text-base flex items-center justify-center gap-1 font-montserrat ${
+              className={`flex-1 py-4 rounded-xl font-display font-semibold text-base flex items-center justify-center gap-1 uppercase tracking-wide ${
                 isAnswered
-                  ? "bg-[#d90428] text-white hover:bg-[#b80320]"
-                  : "bg-[#222] text-[#666] cursor-not-allowed"
+                  ? "bg-brand-red text-brand-white hover:bg-brand-red-dark"
+                  : "bg-surface-light text-[#666] cursor-not-allowed"
               }`}
             >
               Next →
@@ -226,14 +230,14 @@ function AssessmentContent() {
             <button
               onClick={handleSubmit}
               disabled={!allAnswered || submitting}
-              className={`flex-1 py-4 rounded-xl font-semibold text-base flex items-center justify-center font-montserrat ${
+              className={`flex-1 py-4 rounded-xl font-display font-semibold text-base flex items-center justify-center uppercase tracking-wide ${
                 allAnswered && !submitting
-                  ? "bg-[#d90428] text-white hover:bg-[#b80320]"
-                  : "bg-[#222] text-[#666] cursor-not-allowed"
+                  ? "bg-brand-red text-brand-white hover:bg-brand-red-dark"
+                  : "bg-surface-light text-[#666] cursor-not-allowed"
               }`}
             >
               {submitting ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-brand-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 "Complete"
               )}

@@ -40,10 +40,10 @@ function ResultsContent() {
   }, [overallScore]);
 
   const getScoreTier = (score) => {
-    if (score >= 80) return { label: "Thriving", color: "#3b82f6" };
-    if (score >= 60) return { label: "Good", color: "#22c55e" };
-    if (score >= 40) return { label: "Fair", color: "#eab308" };
-    return { label: "Needs Attention", color: "#ef4444" };
+    if (score >= 80) return { label: "THRIVING", color: "#d4af37" };
+    if (score >= 60) return { label: "GOOD", color: "#22c55e" };
+    if (score >= 40) return { label: "FAIR", color: "#f59e0b" };
+    return { label: "NEEDS ATTENTION", color: "#ef4444" };
   };
 
   const getDimensionIcon = (dimension) => {
@@ -78,14 +78,14 @@ function ResultsContent() {
 
   if (status === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
-        <div className="w-8 h-8 border-4 border-[#d90428] border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-brand-black">
+        <div className="w-8 h-8 border-4 border-brand-red border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-starry text-brand-white">
       <div className="max-w-xl mx-auto px-5 py-10">
         {/* Score Circle */}
         <div className="text-center mb-10 animate-fade-in">
@@ -93,7 +93,7 @@ function ResultsContent() {
             <svg className="w-full h-full -rotate-90" viewBox="0 0 200 200">
               <circle
                 cx="100" cy="100" r="80"
-                fill="none" stroke="#333" strokeWidth="12"
+                fill="none" stroke="#2B2B2B" strokeWidth="12"
               />
               <circle
                 cx="100" cy="100" r="80"
@@ -106,7 +106,7 @@ function ResultsContent() {
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
               <span
-                className="text-6xl font-semibold font-montserrat"
+                className="text-7xl font-display font-bold"
                 style={{ color: tier.color }}
               >
                 {displayScore}
@@ -117,42 +117,42 @@ function ResultsContent() {
           <div className="flex items-center justify-center gap-2 mb-3">
             <span className="text-xl">✨</span>
             <span
-              className="text-2xl font-semibold font-montserrat"
+              className="text-2xl font-display font-bold uppercase tracking-wider"
               style={{ color: tier.color }}
             >
               {tier.label}
             </span>
           </div>
 
-          <p className="text-sm text-[#999] leading-6 px-5 font-montserrat">
+          <p className="text-sm text-[#999] leading-6 px-5 font-body">
             {getMessage(overallScore)}
           </p>
         </div>
 
         {/* Dimension Breakdown */}
-        <h2 className="text-xl font-semibold text-white mb-4 font-montserrat">
+        <h2 className="text-2xl font-display font-bold text-brand-white mb-4 uppercase tracking-wide">
           Dimension Breakdown
         </h2>
 
         <div className="space-y-3 mb-6">
           {Object.entries(scores).map(([dimension, score]) => (
-            <div key={dimension} className="bg-[#1a1a1a] rounded-2xl p-5">
+            <div key={dimension} className="card-brand">
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center gap-3 flex-1">
                   <span className="text-2xl">{getDimensionIcon(dimension)}</span>
-                  <span className="text-base font-semibold text-white font-montserrat">
+                  <span className="text-base font-display font-semibold text-brand-white uppercase tracking-wide">
                     {dimension}
                   </span>
                 </div>
                 <span
-                  className="text-3xl font-semibold font-montserrat"
+                  className="text-3xl font-display font-bold"
                   style={{ color: getScoreTier(score).color }}
                 >
                   {score}
                 </span>
               </div>
 
-              <div className="h-2 bg-[#333] rounded-full overflow-hidden mb-3">
+              <div className="h-2 bg-surface-light rounded-full overflow-hidden mb-3">
                 <div
                   className="h-full rounded-full transition-all duration-500"
                   style={{
@@ -162,30 +162,35 @@ function ResultsContent() {
                 />
               </div>
 
-              <p className="text-sm text-[#999] font-montserrat">
+              <p className="text-sm text-brand-lime font-body">
                 💡 {getRecommendations(dimension, score)}
               </p>
             </div>
           ))}
         </div>
 
-        <div className="bg-[#222] rounded-2xl p-5 mb-6">
-          <p className="text-sm text-[#999] leading-6 text-center font-montserrat">
-            Wellness is multidimensional—celebrate strength and lean into growth. Commit to one new action this week.
+        {/* Motivational message */}
+        <div className="bg-surface-light rounded-2xl p-5 mb-6">
+          <p className="text-sm text-[#999] leading-6 text-center font-body italic">
+            "Wellness is multidimensional—celebrate strength and lean into growth."
+          </p>
+          <p className="text-xs text-brand-lime text-center mt-2 font-display uppercase tracking-wide">
+            Commit to one new action this week
           </p>
         </div>
 
+        {/* Action buttons */}
         <Link
           to="/dashboard"
-          className="w-full bg-[#d90428] hover:bg-[#b80320] text-white rounded-2xl py-4 px-6 font-semibold text-base flex items-center justify-center gap-2 transition-colors mb-3"
+          className="btn-brand w-full mb-3"
         >
-          <img src={actualizeIcon} alt="Home" className="w-10 h-10" />
+          <img src={actualizeIcon} alt="Home" className="w-6 h-6" />
           Go to Dashboard
         </Link>
 
         <Link
           to="/history"
-          className="w-full bg-transparent border border-[#333] hover:border-[#555] text-white rounded-2xl py-4 px-6 font-semibold text-base flex items-center justify-center gap-2 transition-colors"
+          className="btn-secondary w-full"
         >
           <span>📈</span>
           View History

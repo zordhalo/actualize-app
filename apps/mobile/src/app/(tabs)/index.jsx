@@ -10,7 +10,7 @@ import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Plus, TrendingUp, Target } from "lucide-react-native";
 import { router } from "expo-router";
-import { useAppTheme } from "@/utils/theme";
+import { useAppTheme, fonts } from "@/utils/theme";
 import useUser from "@/utils/useUser";
 import { useAuth } from "@/utils/auth/useAuth";
 
@@ -47,10 +47,10 @@ export default function HomeScreen() {
   };
 
   const getScoreTier = (score) => {
-    if (score >= 80) return { label: "Thriving", color: colors.thriving };
-    if (score >= 60) return { label: "Good", color: colors.good };
-    if (score >= 40) return { label: "Fair", color: colors.fair };
-    return { label: "Needs Attention", color: colors.needsAttention };
+    if (score >= 80) return { label: "THRIVING", color: colors.thriving };
+    if (score >= 60) return { label: "GOOD", color: colors.good };
+    if (score >= 40) return { label: "FAIR", color: colors.fair };
+    return { label: "NEEDS ATTENTION", color: colors.needsAttention };
   };
 
   const getDimensionIcon = (dimension) => {
@@ -98,10 +98,12 @@ export default function HomeScreen() {
         >
           <Text
             style={{
-              fontSize: 32,
-              fontFamily: "Montserrat_600SemiBold",
-              color: colors.primary,
+              fontSize: 40,
+              fontFamily: fonts.display.bold,
+              color: colors.actualize,
               marginTop: 40,
+              textTransform: "uppercase",
+              letterSpacing: 2,
             }}
           >
             Actualize
@@ -109,7 +111,7 @@ export default function HomeScreen() {
           <Text
             style={{
               fontSize: 16,
-              fontFamily: "Montserrat_500Medium",
+              fontFamily: fonts.body.medium,
               color: colors.secondary,
               marginTop: 8,
               lineHeight: 24,
@@ -136,10 +138,12 @@ export default function HomeScreen() {
           >
             <Text
               style={{
-                fontSize: 20,
-                fontFamily: "Montserrat_600SemiBold",
+                fontSize: 22,
+                fontFamily: fonts.display.semiBold,
                 color: colors.primary,
                 marginBottom: 12,
+                textTransform: "uppercase",
+                letterSpacing: 1,
               }}
             >
               Welcome to Actualize
@@ -147,7 +151,7 @@ export default function HomeScreen() {
             <Text
               style={{
                 fontSize: 14,
-                fontFamily: "Montserrat_500Medium",
+                fontFamily: fonts.body.regular,
                 color: colors.secondary,
                 lineHeight: 22,
               }}
@@ -170,8 +174,10 @@ export default function HomeScreen() {
             <Text
               style={{
                 fontSize: 16,
-                fontFamily: "Montserrat_600SemiBold",
+                fontFamily: fonts.display.semiBold,
                 color: "#FFFFFF",
+                textTransform: "uppercase",
+                letterSpacing: 1,
               }}
             >
               Get Started
@@ -195,10 +201,12 @@ export default function HomeScreen() {
       >
         <Text
           style={{
-            fontSize: 32,
-            fontFamily: "Montserrat_600SemiBold",
-            color: colors.primary,
+            fontSize: 36,
+            fontFamily: fonts.display.bold,
+            color: colors.actualize,
             marginTop: 20,
+            textTransform: "uppercase",
+            letterSpacing: 2,
           }}
         >
           Actualize
@@ -206,7 +214,7 @@ export default function HomeScreen() {
         <Text
           style={{
             fontSize: 14,
-            fontFamily: "Montserrat_500Medium",
+            fontFamily: fonts.body.medium,
             color: colors.secondary,
             marginTop: 4,
           }}
@@ -235,10 +243,12 @@ export default function HomeScreen() {
             >
               <Text
                 style={{
-                  fontSize: 20,
-                  fontFamily: "Montserrat_600SemiBold",
+                  fontSize: 22,
+                  fontFamily: fonts.display.semiBold,
                   color: colors.primary,
                   marginBottom: 12,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
                 }}
               >
                 Start Your Journey
@@ -246,7 +256,7 @@ export default function HomeScreen() {
               <Text
                 style={{
                   fontSize: 14,
-                  fontFamily: "Montserrat_500Medium",
+                  fontFamily: fonts.body.regular,
                   color: colors.secondary,
                   lineHeight: 22,
                   marginBottom: 24,
@@ -271,8 +281,10 @@ export default function HomeScreen() {
                 <Text
                   style={{
                     fontSize: 16,
-                    fontFamily: "Montserrat_600SemiBold",
+                    fontFamily: fonts.display.semiBold,
                     color: "#FFFFFF",
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
                   }}
                 >
                   Begin Assessment
@@ -289,10 +301,12 @@ export default function HomeScreen() {
             >
               <Text
                 style={{
-                  fontSize: 16,
-                  fontFamily: "Montserrat_600SemiBold",
+                  fontSize: 18,
+                  fontFamily: fonts.display.semiBold,
                   color: colors.primary,
                   marginBottom: 16,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
                 }}
               >
                 Five Dimensions of Wellness
@@ -321,7 +335,7 @@ export default function HomeScreen() {
                   <Text
                     style={{
                       fontSize: 14,
-                      fontFamily: "Montserrat_500Medium",
+                      fontFamily: fonts.body.medium,
                       color: colors.primary,
                     }}
                   >
@@ -352,8 +366,10 @@ export default function HomeScreen() {
                 <Text
                   style={{
                     fontSize: 20,
-                    fontFamily: "Montserrat_600SemiBold",
+                    fontFamily: fonts.display.semiBold,
                     color: colors.primary,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
                   }}
                 >
                   Latest Score
@@ -370,8 +386,10 @@ export default function HomeScreen() {
                   <Text
                     style={{
                       fontSize: 12,
-                      fontFamily: "Montserrat_600SemiBold",
+                      fontFamily: fonts.display.semiBold,
                       color: "#FFFFFF",
+                      textTransform: "uppercase",
+                      letterSpacing: 1,
                     }}
                   >
                     Retake
@@ -382,8 +400,8 @@ export default function HomeScreen() {
               <View style={{ alignItems: "center", marginBottom: 20 }}>
                 <Text
                   style={{
-                    fontSize: 64,
-                    fontFamily: "Montserrat_600SemiBold",
+                    fontSize: 72,
+                    fontFamily: fonts.display.bold,
                     color: getScoreTier(latestAssessment.overallScore).color,
                   }}
                 >
@@ -391,10 +409,12 @@ export default function HomeScreen() {
                 </Text>
                 <Text
                   style={{
-                    fontSize: 16,
-                    fontFamily: "Montserrat_600SemiBold",
+                    fontSize: 18,
+                    fontFamily: fonts.display.semiBold,
                     color: getScoreTier(latestAssessment.overallScore).color,
                     marginTop: 8,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
                   }}
                 >
                   {getScoreTier(latestAssessment.overallScore).label}
@@ -404,7 +424,7 @@ export default function HomeScreen() {
               <Text
                 style={{
                   fontSize: 14,
-                  fontFamily: "Montserrat_500Medium",
+                  fontFamily: fonts.body.regular,
                   color: colors.secondary,
                   textAlign: "center",
                   lineHeight: 20,
@@ -430,10 +450,12 @@ export default function HomeScreen() {
             >
               <Text
                 style={{
-                  fontSize: 16,
-                  fontFamily: "Montserrat_600SemiBold",
+                  fontSize: 18,
+                  fontFamily: fonts.display.semiBold,
                   color: colors.primary,
                   marginBottom: 16,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
                 }}
               >
                 Dimension Breakdown
@@ -465,7 +487,7 @@ export default function HomeScreen() {
                       <Text
                         style={{
                           fontSize: 14,
-                          fontFamily: "Montserrat_500Medium",
+                          fontFamily: fonts.body.medium,
                           color: colors.primary,
                         }}
                       >
@@ -477,8 +499,8 @@ export default function HomeScreen() {
                     >
                       <Text
                         style={{
-                          fontSize: 18,
-                          fontFamily: "Montserrat_600SemiBold",
+                          fontSize: 20,
+                          fontFamily: fonts.display.semiBold,
                           color: getScoreTier(score).color,
                           marginRight: 8,
                         }}
@@ -525,9 +547,11 @@ export default function HomeScreen() {
                 <Text
                   style={{
                     fontSize: 16,
-                    fontFamily: "Montserrat_600SemiBold",
+                    fontFamily: fonts.display.semiBold,
                     color: colors.primary,
                     marginLeft: 12,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
                   }}
                 >
                   View Progress History

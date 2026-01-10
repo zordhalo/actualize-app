@@ -2,29 +2,13 @@ import React from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  useFonts,
-  Montserrat_400Regular,
-  Montserrat_500Medium,
-  Montserrat_600SemiBold,
-} from "@expo-google-fonts/montserrat";
 import { Play, Clock, ChevronLeft } from "lucide-react-native";
 import { router } from "expo-router";
-import { useAppTheme } from "@/utils/theme";
+import { useAppTheme, fonts } from "@/utils/theme";
 
 export default function AssessmentIntroScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
-
-  const [fontsLoaded] = useFonts({
-    Montserrat_400Regular,
-    Montserrat_500Medium,
-    Montserrat_600SemiBold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
 
   const dimensions = [
     {
@@ -71,10 +55,12 @@ export default function AssessmentIntroScreen() {
       >
         <Text
           style={{
-            fontSize: 32,
-            fontFamily: "Montserrat_600SemiBold",
+            fontSize: 36,
+            fontFamily: fonts.display.bold,
             color: colors.primary,
             marginBottom: 16,
+            textTransform: "uppercase",
+            letterSpacing: 1,
           }}
         >
           Wellness Assessment
@@ -83,7 +69,7 @@ export default function AssessmentIntroScreen() {
         <Text
           style={{
             fontSize: 16,
-            fontFamily: "Montserrat_400Regular",
+            fontFamily: fonts.body.regular,
             color: colors.secondary,
             lineHeight: 24,
             marginBottom: 32,
@@ -112,9 +98,11 @@ export default function AssessmentIntroScreen() {
             <Text
               style={{
                 fontSize: 14,
-                fontFamily: "Montserrat_600SemiBold",
+                fontFamily: fonts.display.semiBold,
                 color: colors.primary,
                 marginLeft: 8,
+                textTransform: "uppercase",
+                letterSpacing: 1,
               }}
             >
               Estimated Time: 8-10 minutes
@@ -123,7 +111,7 @@ export default function AssessmentIntroScreen() {
           <Text
             style={{
               fontSize: 14,
-              fontFamily: "Montserrat_400Regular",
+              fontFamily: fonts.body.regular,
               color: colors.secondary,
               lineHeight: 22,
             }}
@@ -136,10 +124,12 @@ export default function AssessmentIntroScreen() {
 
         <Text
           style={{
-            fontSize: 18,
-            fontFamily: "Montserrat_600SemiBold",
+            fontSize: 20,
+            fontFamily: fonts.display.semiBold,
             color: colors.primary,
             marginBottom: 16,
+            textTransform: "uppercase",
+            letterSpacing: 1,
           }}
         >
           Five Dimensions
@@ -166,8 +156,10 @@ export default function AssessmentIntroScreen() {
               <Text
                 style={{
                   fontSize: 16,
-                  fontFamily: "Montserrat_600SemiBold",
+                  fontFamily: fonts.display.semiBold,
                   color: colors.primary,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
                 }}
               >
                 {dim.name}
@@ -176,7 +168,7 @@ export default function AssessmentIntroScreen() {
             <Text
               style={{
                 fontSize: 13,
-                fontFamily: "Montserrat_400Regular",
+                fontFamily: fonts.body.regular,
                 color: colors.secondary,
                 marginLeft: 36,
               }}
@@ -197,13 +189,22 @@ export default function AssessmentIntroScreen() {
         >
           <Text
             style={{
-              fontSize: 13,
-              fontFamily: "Montserrat_500Medium",
-              color: colors.secondary,
+              fontSize: 14,
+              fontFamily: fonts.body.italic,
+              color: colors.lime,
               lineHeight: 20,
             }}
           >
-            Progress isn't perfection—it's awareness and deliberate change.
+            "Progress isn't perfection—it's awareness and deliberate change."
+          </Text>
+          <Text
+            style={{
+              fontSize: 12,
+              fontFamily: fonts.body.regular,
+              color: colors.secondary,
+              marginTop: 8,
+            }}
+          >
             Answer honestly for the most accurate insights.
           </Text>
         </View>
@@ -223,8 +224,10 @@ export default function AssessmentIntroScreen() {
           <Text
             style={{
               fontSize: 16,
-              fontFamily: "Montserrat_600SemiBold",
+              fontFamily: fonts.display.semiBold,
               color: "#FFFFFF",
+              textTransform: "uppercase",
+              letterSpacing: 1,
             }}
           >
             Start Assessment

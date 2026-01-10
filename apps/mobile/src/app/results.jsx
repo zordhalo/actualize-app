@@ -10,7 +10,7 @@ import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Home, TrendingUp, Sparkles } from "lucide-react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { useAppTheme } from "@/utils/theme";
+import { useAppTheme, fonts } from "@/utils/theme";
 import Svg, { Circle } from "react-native-svg";
 
 export default function ResultsScreen() {
@@ -67,10 +67,10 @@ export default function ResultsScreen() {
   }, [overallScore]);
 
   const getScoreTier = (score) => {
-    if (score >= 80) return { label: "Thriving", color: colors.thriving };
-    if (score >= 60) return { label: "Good", color: colors.good };
-    if (score >= 40) return { label: "Fair", color: colors.fair };
-    return { label: "Needs Attention", color: colors.needsAttention };
+    if (score >= 80) return { label: "THRIVING", color: colors.thriving };
+    if (score >= 60) return { label: "GOOD", color: colors.good };
+    if (score >= 40) return { label: "FAIR", color: colors.fair };
+    return { label: "NEEDS ATTENTION", color: colors.needsAttention };
   };
 
   const getDimensionIcon = (dimension) => {
@@ -190,8 +190,8 @@ export default function ResultsScreen() {
             <View style={{ position: "absolute", alignItems: "center" }}>
               <Text
                 style={{
-                  fontSize: 64,
-                  fontFamily: "Inconsolata_600SemiBold",
+                  fontSize: 72,
+                  fontFamily: fonts.display.bold,
                   color: tier.color,
                 }}
               >
@@ -211,8 +211,10 @@ export default function ResultsScreen() {
             <Text
               style={{
                 fontSize: 24,
-                fontFamily: "Montserrat_600SemiBold",
+                fontFamily: fonts.display.bold,
                 color: tier.color,
+                textTransform: "uppercase",
+                letterSpacing: 2,
               }}
             >
               {tier.label}
@@ -222,7 +224,7 @@ export default function ResultsScreen() {
           <Text
             style={{
               fontSize: 15,
-              fontFamily: "Montserrat_500Medium",
+              fontFamily: fonts.body.regular,
               color: colors.secondary,
               textAlign: "center",
               lineHeight: 24,
@@ -235,10 +237,12 @@ export default function ResultsScreen() {
 
         <Text
           style={{
-            fontSize: 20,
-            fontFamily: "Montserrat_600SemiBold",
+            fontSize: 22,
+            fontFamily: fonts.display.bold,
             color: colors.primary,
             marginBottom: 16,
+            textTransform: "uppercase",
+            letterSpacing: 1,
           }}
         >
           Dimension Breakdown
@@ -271,8 +275,10 @@ export default function ResultsScreen() {
                 <Text
                   style={{
                     fontSize: 16,
-                    fontFamily: "Montserrat_600SemiBold",
+                    fontFamily: fonts.display.semiBold,
                     color: colors.primary,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
                   }}
                 >
                   {dimension}
@@ -280,8 +286,8 @@ export default function ResultsScreen() {
               </View>
               <Text
                 style={{
-                  fontSize: 28,
-                  fontFamily: "Inconsolata_600SemiBold",
+                  fontSize: 32,
+                  fontFamily: fonts.display.bold,
                   color: getScoreTier(score).color,
                 }}
               >
@@ -311,8 +317,8 @@ export default function ResultsScreen() {
             <Text
               style={{
                 fontSize: 13,
-                fontFamily: "Montserrat_400Regular",
-                color: colors.secondary,
+                fontFamily: fonts.body.regular,
+                color: colors.lime,
                 lineHeight: 20,
               }}
             >
@@ -333,14 +339,27 @@ export default function ResultsScreen() {
           <Text
             style={{
               fontSize: 14,
-              fontFamily: "Montserrat_500Medium",
+              fontFamily: fonts.body.italic,
               color: colors.secondary,
               lineHeight: 22,
               textAlign: "center",
             }}
           >
-            Wellness is multidimensional—celebrate strength and lean into
-            growth. Commit to one new action this week.
+            "Wellness is multidimensional—celebrate strength and lean into
+            growth."
+          </Text>
+          <Text
+            style={{
+              fontSize: 12,
+              fontFamily: fonts.display.semiBold,
+              color: colors.lime,
+              textAlign: "center",
+              marginTop: 8,
+              textTransform: "uppercase",
+              letterSpacing: 1,
+            }}
+          >
+            Commit to one new action this week
           </Text>
         </View>
 
@@ -360,8 +379,10 @@ export default function ResultsScreen() {
           <Text
             style={{
               fontSize: 16,
-              fontFamily: "Montserrat_600SemiBold",
+              fontFamily: fonts.display.semiBold,
               color: "#FFFFFF",
+              textTransform: "uppercase",
+              letterSpacing: 1,
             }}
           >
             Go to Dashboard
@@ -389,7 +410,7 @@ export default function ResultsScreen() {
           <Text
             style={{
               fontSize: 16,
-              fontFamily: "Montserrat_600SemiBold",
+              fontFamily: fonts.body.semiBold,
               color: colors.primary,
             }}
           >

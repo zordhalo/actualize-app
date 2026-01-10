@@ -55,83 +55,85 @@ function ProfileContent() {
 
   if (loading || userLoading || status === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
-        <div className="w-8 h-8 border-4 border-[#d90428] border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-brand-black">
+        <div className="w-8 h-8 border-4 border-brand-red border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-brand-black text-brand-white">
       <div className="max-w-2xl mx-auto px-5 py-8">
+        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-white font-montserrat">
+          <h1 className="text-4xl font-display font-bold text-brand-white uppercase tracking-wide">
             Profile
           </h1>
-          <p className="text-sm text-[#999] mt-1 font-montserrat">
+          <p className="text-sm text-[#999] mt-1 font-body">
             Your wellness account
           </p>
         </div>
 
         {/* User Info Card */}
-        <div className="bg-[#1a1a1a] rounded-2xl p-6 mb-5 text-center">
-          <div className="w-20 h-20 rounded-full bg-[#d90428] flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl font-semibold text-white font-montserrat">
+        <div className="card-brand text-center mb-5">
+          <div className="w-20 h-20 rounded-full bg-brand-red flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl font-display font-bold text-brand-white">
               {getInitials(user?.email)}
             </span>
           </div>
 
-          <h2 className="text-xl font-semibold text-white mb-2 font-montserrat">
+          <h2 className="text-xl font-display font-semibold text-brand-white mb-2 uppercase tracking-wide">
             {profile?.profile?.fullName || user?.name || "Wellness User"}
           </h2>
 
           <div className="flex items-center justify-center gap-1.5 mb-1">
             <span className="text-[#999] text-sm">✉</span>
-            <span className="text-sm text-[#999] font-montserrat">{user?.email}</span>
+            <span className="text-sm text-[#999] font-body">{user?.email}</span>
           </div>
 
           {profile?.profile?.memberSince && (
             <div className="flex items-center justify-center gap-1.5">
               <span className="text-[#999] text-sm">📅</span>
-              <span className="text-sm text-[#999] font-montserrat">
+              <span className="text-sm text-[#999] font-body">
                 Member since {formatDate(profile.profile.memberSince)}
               </span>
             </div>
           )}
         </div>
 
-        {/* Stats */}
-        <h3 className="text-base font-semibold text-white mb-4 font-montserrat">
+        {/* Stats Header */}
+        <h3 className="text-lg font-display font-semibold text-brand-white mb-4 uppercase tracking-wide">
           Wellness Stats
         </h3>
 
-        <div className="bg-[#1a1a1a] rounded-2xl p-5 mb-5">
+        {/* Stats Card */}
+        <div className="card-brand mb-5">
           <div className="flex justify-around mb-5">
             <div className="text-center">
-              <div className="w-14 h-14 rounded-full bg-[#d90428]/20 flex items-center justify-center mx-auto mb-2">
+              <div className="w-14 h-14 rounded-full bg-brand-red/20 flex items-center justify-center mx-auto mb-2">
                 <span className="text-2xl">📈</span>
               </div>
-              <div className="text-2xl font-semibold text-white font-montserrat">
+              <div className="text-2xl font-display font-bold text-brand-white">
                 {profile?.stats?.totalAssessments || 0}
               </div>
-              <div className="text-xs text-[#999] mt-1 font-montserrat">Assessments</div>
+              <div className="text-xs text-[#999] mt-1 font-body uppercase">Assessments</div>
             </div>
 
             <div className="text-center">
               <div className="w-14 h-14 rounded-full bg-[#22c55e]/20 flex items-center justify-center mx-auto mb-2">
                 <span className="text-2xl">🏆</span>
               </div>
-              <div className="text-2xl font-semibold text-white font-montserrat">
+              <div className="text-2xl font-display font-bold text-brand-white">
                 {profile?.stats?.averageScore || 0}
               </div>
-              <div className="text-xs text-[#999] mt-1 font-montserrat">Avg Score</div>
+              <div className="text-xs text-[#999] mt-1 font-body uppercase">Avg Score</div>
             </div>
           </div>
 
           {profile?.stats?.bestDimension && (
-            <div className="bg-[#222] rounded-xl p-4">
-              <div className="text-sm text-[#999] mb-1 font-montserrat">Your Best Dimension</div>
-              <div className="text-lg font-semibold text-white font-montserrat">
+            <div className="bg-surface-light rounded-xl p-4">
+              <div className="text-sm text-[#999] mb-1 font-body">Your Best Dimension</div>
+              <div className="text-lg font-display font-semibold text-brand-lime uppercase tracking-wide">
                 {profile.stats.bestDimension}
               </div>
             </div>
@@ -141,26 +143,26 @@ function ProfileContent() {
         {/* Sign Out Button */}
         <button
           onClick={handleSignOut}
-          className="w-full bg-[#1a1a1a] border border-[#333] hover:border-[#555] text-[#ef4444] rounded-2xl py-4 px-5 font-semibold text-base flex items-center justify-center gap-3 transition-colors"
+          className="w-full bg-surface border border-surface-light hover:border-[#ef4444] text-[#ef4444] rounded-2xl py-4 px-5 font-display font-semibold text-base flex items-center justify-center gap-3 transition-colors uppercase tracking-wide"
         >
           <span>🚪</span>
           Sign Out
         </button>
 
-        {/* Navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#333] px-4 py-3">
+        {/* Bottom Navigation */}
+        <div className="fixed bottom-0 left-0 right-0 bg-surface border-t border-surface-light px-4 py-3">
           <div className="max-w-2xl mx-auto flex justify-around">
-            <Link to="/dashboard" className="flex flex-col items-center gap-1 text-[#999] hover:text-white">
-              <img src={actualizeIcon} alt="Home" className="w-10 h-10" />
-              <span className="text-xs font-montserrat">Home</span>
+            <Link to="/dashboard" className="flex flex-col items-center gap-1 text-[#999] hover:text-brand-white">
+              <img src={actualizeIcon} alt="Home" className="w-9 h-9" />
+              <span className="text-xs font-body">Home</span>
             </Link>
-            <Link to="/history" className="flex flex-col items-center gap-1 text-[#999] hover:text-white">
-              <img src={actualizeArrowsIcon} alt="History" className="w-10 h-10" />
-              <span className="text-xs font-montserrat">History</span>
+            <Link to="/history" className="flex flex-col items-center gap-1 text-[#999] hover:text-brand-white">
+              <img src={actualizeArrowsIcon} alt="History" className="w-12 h-12" />
+              <span className="text-xs font-body">History</span>
             </Link>
-            <Link to="/profile" className="flex flex-col items-center gap-1 text-[#d90428]">
-              <img src={actualizeBoltIcon} alt="Profile" className="w-10 h-10" />
-              <span className="text-xs font-montserrat">Profile</span>
+            <Link to="/profile" className="flex flex-col items-center gap-1 text-brand-red">
+              <img src={actualizeBoltIcon} alt="Profile" className="w-12 h-12" />
+              <span className="text-xs font-body">Profile</span>
             </Link>
           </div>
         </div>

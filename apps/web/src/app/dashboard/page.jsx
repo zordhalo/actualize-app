@@ -68,7 +68,7 @@ function DashboardContent() {
           <img 
             src={actualizeLogo} 
             alt="Actualize" 
-            className="h-9"
+            className="h-[54px]"
           />
           <p className="text-sm text-[#999] mt-1 font-body">
             Your Wellness Dashboard
@@ -191,15 +191,15 @@ function DashboardContent() {
         <div className="fixed bottom-0 left-0 right-0 bg-surface border-t border-surface-light px-4 py-3">
           <div className="max-w-2xl mx-auto flex justify-around">
             <Link to="/dashboard" className="flex flex-col items-center gap-1 text-brand-red">
-              <img src={actualizeIcon} alt="Home" className="w-5 h-5" />
+              <img src={actualizeIcon} alt="Home" className="w-9 h-9" />
               <span className="text-xs font-body">Home</span>
             </Link>
             <Link to="/history" className="flex flex-col items-center gap-1 text-[#999] hover:text-brand-white">
-              <img src={actualizeArrowsIcon} alt="History" className="w-5 h-5" />
+              <img src={actualizeArrowsIcon} alt="History" className="w-12 h-12" />
               <span className="text-xs font-body">History</span>
             </Link>
             <Link to="/profile" className="flex flex-col items-center gap-1 text-[#999] hover:text-brand-white">
-              <img src={actualizeBoltIcon} alt="Profile" className="w-5 h-5" />
+              <img src={actualizeBoltIcon} alt="Profile" className="w-12 h-12" />
               <span className="text-xs font-body">Profile</span>
             </Link>
           </div>
