@@ -1,25 +1,25 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useSession } from "@auth/create/react";
+import { useAuth } from "@/auth/AuthProvider";
 import useUser from "@/utils/useUser";
-import useAuth from "@/utils/useAuth";
+import useAuthHook from "@/utils/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import actualizeIcon from "../../../../../brand/actualizeLogoNBG.avif";
 import actualizeArrowsIcon from "../../../../../brand/actualizeIconArrowsNBG.png";
 import actualizeBoltIcon from "../../../../../brand/actualizeIconBoltNBG.png";
 
 function ProfileContent() {
-  const { status } = useSession();
+  const { loading } = useAuth();
   const { data: user, loading: userLoading } = useUser();
-  const { signOut } = useAuth();
+  const { signOut } = useAuthHook();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   useEffect(() => {
-    if (status === "loading") return;
+    if (loading) return;
     fetchProfile();
-  }, [status]);
+  }, [loading]);
 
   const fetchProfile = async () => {
     try {
@@ -31,7 +31,7 @@ function ProfileContent() {
     } catch (error) {
       console.error("Error fetching profile:", error);
     } finally {
-      setLoading(false);
+      setProfileLoading(false);
     }
   };
 

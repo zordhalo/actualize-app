@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useSession } from "@auth/create/react";
+import { useAuth } from "@/auth/AuthProvider";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 function AssessmentContent() {
-  const { status } = useSession();
+  const { loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -13,9 +13,9 @@ function AssessmentContent() {
   const [responses, setResponses] = useState({});
 
   useEffect(() => {
-    if (status === "loading") return;
+    if (authLoading) return;
     fetchQuestions();
-  }, [status]);
+  }, [authLoading]);
 
   const fetchQuestions = async () => {
     try {

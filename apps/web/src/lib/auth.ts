@@ -90,7 +90,17 @@ export const auth = betterAuth({
     process.env.AUTH_URL ||
     (process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000"),
+      : "http://localhost:4001"),
+
+  // Trusted origins for CORS - required for Better Auth to accept requests
+  trustedOrigins: [
+    "http://localhost:4001",
+    "http://localhost:4000",
+    "http://localhost:3000",
+    ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
+    ...(process.env.AUTH_URL ? [process.env.AUTH_URL] : []),
+    ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+  ],
 
   // Database adapter with serverless-optimized connection
   database: mongodbAdapter(getMongoClient, {
@@ -105,8 +115,8 @@ export const auth = betterAuth({
   // OAuth providers
   socialProviders: {
     github: {
-      clientId: process.env.GITHUB_CLIENT_ID || "",
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+      clientId: process.env.AUTH_GITHUB_ID || process.env.GITHUB_CLIENT_ID || "",
+      clientSecret: process.env.AUTH_GITHUB_SECRET || process.env.GITHUB_CLIENT_SECRET || "",
       // Callback is automatically set to {baseURL}/api/auth/callback/github
     },
   },

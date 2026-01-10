@@ -1,9 +1,9 @@
 import { Link, useNavigate } from "react-router";
-import { useSession } from "@auth/create/react";
+import { useAuth } from "@/auth/AuthProvider";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 function AssessmentIntroContent() {
-  const { status } = useSession();
+  const { loading } = useAuth();
   const navigate = useNavigate();
 
   const dimensions = [
@@ -14,7 +14,7 @@ function AssessmentIntroContent() {
     { name: "Financial", icon: "💰", description: "Money mindset, security" },
   ];
 
-  if (status === "loading") {
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-brand-black">
         <div className="w-8 h-8 border-4 border-brand-red border-t-transparent rounded-full animate-spin" />

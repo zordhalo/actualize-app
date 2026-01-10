@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router";
-import { useSession } from "@auth/create/react";
+import { useAuth } from "@/auth/AuthProvider";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import actualizeIcon from "../../../../../brand/actualizeLogoNBG.avif";
 
 function ResultsContent() {
-  const { status } = useSession();
+  const { loading } = useAuth();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 

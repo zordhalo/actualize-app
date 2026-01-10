@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
-import { useSession } from "@auth/create/react";
+import { useAuth } from "@/auth/AuthProvider";
 import useUser from "@/utils/useUser";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import actualizeLogo from "../../../../../brand/actualizeFullTextwLogo.png";
@@ -9,7 +9,7 @@ import actualizeArrowsIcon from "../../../../../brand/actualizeIconArrowsNBG.png
 import actualizeBoltIcon from "../../../../../brand/actualizeIconBoltNBG.png";
 
 function DashboardContent() {
-  const { data: session } = useSession();
+  const { user: sessionUser } = useAuth();
   const { data: user, loading: userLoading } = useUser();
   const [latestAssessment, setLatestAssessment] = useState(null);
   const [loading, setLoading] = useState(true);

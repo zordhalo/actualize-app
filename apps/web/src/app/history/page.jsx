@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useSession } from "@auth/create/react";
+import { useAuth } from "@/auth/AuthProvider";
 import useUser from "@/utils/useUser";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import actualizeIcon from "../../../../../brand/actualizeLogoNBG.avif";
@@ -8,16 +8,16 @@ import actualizeArrowsIcon from "../../../../../brand/actualizeIconArrowsNBG.png
 import actualizeBoltIcon from "../../../../../brand/actualizeIconBoltNBG.png";
 
 function HistoryContent() {
-  const { status } = useSession();
+  const { loading: authLoading } = useAuth();
   const { data: user, loading: userLoading } = useUser();
   const navigate = useNavigate();
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (status === "loading") return;
+    if (authLoading) return;
     fetchAssessments();
-  }, [status]);
+  }, [authLoading]);
 
   const fetchAssessments = async () => {
     try {

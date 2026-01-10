@@ -96,7 +96,7 @@ if (process.env.CORS_ORIGINS) {
   app.use(
     '/api/*',
     cors({
-      origin: process.env.BETTER_AUTH_URL || process.env.AUTH_URL || 'http://localhost:3000',
+      origin: process.env.BETTER_AUTH_URL || process.env.AUTH_URL || 'http://localhost:4001',
       credentials: true,
     })
   );

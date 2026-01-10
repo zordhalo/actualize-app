@@ -45,15 +45,11 @@ const getBaseURL = () => {
     if (process.env.VERCEL_URL) {
       return `https://${process.env.VERCEL_URL}`;
     }
-    return "http://localhost:3000";
+    return "http://localhost:4001";
   }
 
-  // Client-side: Check for localhost development
-  if (window.location.hostname === "localhost") {
-    return "http://localhost:3000";
-  }
-
-  // Production/preview: use same-origin (empty string = relative URL)
+  // Client-side: use same origin (empty string = relative URL)
+  // This works because the API is served from the same Hono server
   return "";
 };
 

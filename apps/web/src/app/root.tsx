@@ -23,8 +23,6 @@ import './global.css';
 
 import { toPng } from 'html-to-image';
 import fetch from '@/__create/fetch';
-// @ts-ignore
-import { SessionProvider } from '@auth/create/react';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { useNavigate } from 'react-router';
 import { serializeError } from 'serialize-error';
@@ -486,14 +484,9 @@ export function Layout({ children }: { children: ReactNode }) {
 
 export default function App() {
   // Use Better Auth AuthProvider - it gracefully handles cases where Better Auth is not configured
-  // For backward compatibility, we also keep SessionProvider available but don't use it by default
-  // Components can fall back to Auth.js hooks if Better Auth is not available
   return (
     <AuthProvider>
-      {/* Keep SessionProvider for backward compatibility with components that still use Auth.js */}
-      <SessionProvider basePath="/api/auth">
-        <Outlet />
-      </SessionProvider>
+      <Outlet />
     </AuthProvider>
   );
 }
