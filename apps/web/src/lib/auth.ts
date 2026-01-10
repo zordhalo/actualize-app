@@ -5,7 +5,7 @@ import { organization } from "better-auth/plugins/organization";
 import { twoFactor } from "better-auth/plugins/two-factor";
 import { MongoClient } from "mongodb";
 
-// Initialize MongoDB client once
+// Initialize MongoDB client
 const uri = process.env.MONGODB_URI;
 if (!uri) {
   throw new Error("MONGODB_URI environment variable is not set");
@@ -14,39 +14,20 @@ if (!uri) {
 const client = new MongoClient(uri, {
   maxPoolSize: 10,
   minPoolSize: 1,
-  serverSelectionTimeoutMS: 10000,
 });
 
-// Connect immediately - Better Auth handles async connections
-const clientPromise = client.connect();
-
-/**
- * Extract database name from MongoDB URI or environment variable
- */
+// Get database name helper
 function getDatabaseName(): string {
   if (process.env.MONGODB_DATABASE) {
     return process.env.MONGODB_DATABASE;
   }
 
   try {
-    if (uri.includes("mongodb+srv://")) {
-      const match = uri.match(/mongodb\+srv:\/\/[^/]+\/([^?]+)/);
-      if (match && match[1]) {
-        return match[1];
-      }
-    } else if (uri.includes("mongodb://")) {
-      const url = new URL(uri.replace("mongodb://", "mongodb://dummy@"));
-      const dbName = url.pathname.slice(1).split("?")[0];
-      if (dbName) {
-        return dbName;
-      }
-    }
-  } catch {
     const match = uri.match(/\/([^/?]+)(\?|$)/);
     if (match && match[1]) {
       return match[1];
     }
-  }
+  } catch {}
 
   return "actualize";
 }
@@ -70,10 +51,8 @@ export const auth = betterAuth({
     ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
   ],
 
-  // Pass the promise directly - Better Auth handles async connections
-  database: mongodbAdapter(clientPromise, {
-    dbName: getDatabaseName(),
-  }),
+  // Pass db instance directly, not a promise
+  database: mongodbAdapter(client.db(getDatabaseName())),
 
   emailAndPassword: {
     enabled: true,
