@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: actualize-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password123
+      - MONGO_INITDB_DATABASE=actualize
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - actualize-network
+
+  # Web Application
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: actualize-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/actualize?authSource=admin
+      - JWT_SECRET=dev-secret-change-in-production
+      - AUTH_SECRET=dev-auth-secret-change-in-production
+      - AUTH_URL=http://localhost:3000
+    depends_on:
+      - mongodb
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+    networks:
+      - actualize-network
+    command: npm run dev
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  actualize-network:
+    driver: bridge
