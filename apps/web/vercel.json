@@ -1,14 +1,21 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm build",
+  "outputDirectory": "build",
   "framework": null,
   
   "functions": {
     "api/**/*.ts": {
-      "memory": 1024,
       "maxDuration": 10
     }
   },
+  
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
+  ],
   
   "headers": [
     {
