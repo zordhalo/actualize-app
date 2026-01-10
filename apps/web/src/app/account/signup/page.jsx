@@ -33,33 +33,43 @@ export default function SignUpPage() {
       return;
     }
 
+    const errorMessages = {
+      OAuthSignin:
+        "Couldn't start sign-up. Please try again or use a different method.",
+      OAuthCallback: "Sign-up failed after redirecting. Please try again.",
+      OAuthCreateAccount:
+        "Couldn't create an account with this sign-up option. Try another one.",
+      EmailCreateAccount:
+        "This email can't be used. It may already be registered.",
+      Callback: "Something went wrong during sign-up. Please try again.",
+      OAuthAccountNotLinked:
+        "This account is linked to a different sign-in method. Try using that instead.",
+      CredentialsSignin:
+        "Invalid email or password. If you already have an account, try signing in instead.",
+      AccessDenied: "You don't have permission to sign up.",
+      Configuration:
+        "Sign-up isn't working right now. Please try again later.",
+      Verification: "Your sign-up link has expired. Request a new one.",
+    };
+
     try {
-      await signUpWithCredentials({
+      const result = await signUpWithCredentials({
         email,
         password,
         callbackUrl: "/",
-        redirect: true,
+        redirect: false,
       });
-    } catch (err) {
-      const errorMessages = {
-        OAuthSignin:
-          "Couldn't start sign-up. Please try again or use a different method.",
-        OAuthCallback: "Sign-up failed after redirecting. Please try again.",
-        OAuthCreateAccount:
-          "Couldn't create an account with this sign-up option. Try another one.",
-        EmailCreateAccount:
-          "This email can't be used. It may already be registered.",
-        Callback: "Something went wrong during sign-up. Please try again.",
-        OAuthAccountNotLinked:
-          "This account is linked to a different sign-in method. Try using that instead.",
-        CredentialsSignin:
-          "Invalid email or password. If you already have an account, try signing in instead.",
-        AccessDenied: "You don't have permission to sign up.",
-        Configuration:
-          "Sign-up isn't working right now. Please try again later.",
-        Verification: "Your sign-up link has expired. Request a new one.",
-      };
 
+      if (result?.error) {
+        setError(
+          errorMessages[result.error] || "Something went wrong. Please try again.",
+        );
+        setLoading(false);
+      } else if (result?.ok) {
+        // Redirect manually on success
+        window.location.href = result.url || "/";
+      }
+    } catch (err) {
       setError(
         errorMessages[err.message] || "Something went wrong. Please try again.",
       );

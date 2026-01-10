@@ -89,6 +89,7 @@ if (process.env.AUTH_SECRET) {
       pages: {
         signIn: '/account/signin',
         signOut: '/account/logout',
+        error: '/account/signin',
       },
       skipCSRFCheck,
       session: {

@@ -115,5 +115,6 @@ export const { auth } = CreateAuth({
   pages: {
     signIn: '/account/signin',
     signOut: '/account/logout',
+    error: '/account/signin',
   },
 })

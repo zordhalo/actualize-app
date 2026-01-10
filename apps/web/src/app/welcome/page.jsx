@@ -52,7 +52,7 @@ export default function WelcomePage() {
               Actionable Recommendations
             </h3>
             <p className="text-sm text-[#999] leading-6 font-body">
-              Get personalized tips to improve <span className="text-brand-lime font-semibold">(IN ALL AREAS OF LIFE)</span>
+              Get personalized tips to improve
             </p>
           </div>
         </div>
