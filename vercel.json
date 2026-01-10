@@ -5,7 +5,7 @@
   
   "rewrites": [
     {
-      "source": "/api/auth/:path*",
+      "source": "/api/auth/(.*)",
       "destination": "/api/auth/[...auth]"
     }
   ],

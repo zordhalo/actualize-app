@@ -1,20 +1,21 @@
 // apps/web/api/auth/[...auth].ts
-import { handle } from "hono/vercel";
+import { toNodeHandler } from "better-auth/node";
 import { auth } from "../../src/lib/auth";
 
 /**
- * Vercel Function handler for Better Auth.
+ * Vercel Serverless Function handler for Better Auth.
  * 
  * This creates a dedicated serverless function that:
  * - Handles all /api/auth/* requests
- * - Uses Hono's Vercel adapter for proper Request/Response handling
- * - Runs independently from React Router
+ * - Uses Better Auth's Node.js handler for proper Request/Response handling
+ * - Runs independently from React Router (Vercel routes API requests here first)
  * 
  * @example
+ * POST /api/auth/sign-up/email → This function
  * POST /api/auth/sign-in/email → This function
- * GET  /api/auth/session/get   → This function
+ * GET  /api/auth/session       → This function
  */
-export default handle(auth.handler);
+export default toNodeHandler(auth);
 
 /**
  * Vercel Function Configuration
