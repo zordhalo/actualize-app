@@ -48,6 +48,18 @@ app.use('*', (c, next) => {
 app.use(contextStorage());
 
 app.onError((err, c) => {
+  // Always return JSON for API routes
+  if (c.req.path.startsWith('/api/')) {
+    return c.json(
+      {
+        error: 'An error occurred',
+        message: err instanceof Error ? err.message : 'Unknown error',
+        details: serializeError(err),
+      },
+      500
+    );
+  }
+  
   if (c.req.method !== 'GET') {
     return c.json(
       {
@@ -57,7 +69,7 @@ app.onError((err, c) => {
       500
     );
   }
-  return c.html(getHTMLForErrorPage(err), 200);
+  return c.html(getHTMLForErrorPage(err), 500);
 });
 
 if (process.env.CORS_ORIGINS) {
@@ -86,6 +98,7 @@ if (process.env.AUTH_SECRET) {
     initAuthConfig(() => ({
       secret: process.env.AUTH_SECRET,
       basePath: '/api/auth',
+      trustHost: true,
       pages: {
         signIn: '/account/signin',
         signOut: '/account/logout',
@@ -311,7 +324,18 @@ app.all('/integrations/:path{.+}', async (c, next) => {
 
 app.use('/api/auth/*', async (c, next) => {
   if (isAuthAction(c.req.path)) {
-    return authHandler()(c, next);
+    try {
+      return await authHandler()(c, next);
+    } catch (error) {
+      console.error('[auth] Auth handler error:', error);
+      return c.json(
+        {
+          error: 'Authentication error',
+          message: error instanceof Error ? error.message : 'Unknown auth error',
+        },
+        500
+      );
+    }
   }
   return next();
 });
