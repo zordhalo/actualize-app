@@ -1,0 +1,306 @@
+{
+  "buildManifest": {
+    "serverBundles": {
+      "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "id": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+        "file": "build/server/nodejs_eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    },
+    "routeIdToServerBundleId": {
+      "page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "account/logout/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "account/signin/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "account/signup/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "assessment/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "assessment-intro/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "dashboard/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "history/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "profile/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "results/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "welcome/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "__create/not-found": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "src/app/root.tsx",
+        "path": "",
+        "config": {}
+      },
+      "page": {
+        "id": "page",
+        "parentId": "root",
+        "file": "src/app/page.jsx",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "account/logout/page": {
+        "id": "account/logout/page",
+        "parentId": "root",
+        "file": "src/app/account/logout/page.jsx",
+        "path": "account/logout",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "account/signin/page": {
+        "id": "account/signin/page",
+        "parentId": "root",
+        "file": "src/app/account/signin/page.jsx",
+        "path": "account/signin",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "account/signup/page": {
+        "id": "account/signup/page",
+        "parentId": "root",
+        "file": "src/app/account/signup/page.jsx",
+        "path": "account/signup",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "assessment/page": {
+        "id": "assessment/page",
+        "parentId": "root",
+        "file": "src/app/assessment/page.jsx",
+        "path": "assessment",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "assessment-intro/page": {
+        "id": "assessment-intro/page",
+        "parentId": "root",
+        "file": "src/app/assessment-intro/page.jsx",
+        "path": "assessment-intro",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "dashboard/page": {
+        "id": "dashboard/page",
+        "parentId": "root",
+        "file": "src/app/dashboard/page.jsx",
+        "path": "dashboard",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "history/page": {
+        "id": "history/page",
+        "parentId": "root",
+        "file": "src/app/history/page.jsx",
+        "path": "history",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "profile/page": {
+        "id": "profile/page",
+        "parentId": "root",
+        "file": "src/app/profile/page.jsx",
+        "path": "profile",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "results/page": {
+        "id": "results/page",
+        "parentId": "root",
+        "file": "src/app/results/page.jsx",
+        "path": "results",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "welcome/page": {
+        "id": "welcome/page",
+        "parentId": "root",
+        "file": "src/app/welcome/page.jsx",
+        "path": "welcome",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "__create/not-found": {
+        "id": "__create/not-found",
+        "parentId": "root",
+        "file": "src/app/__create/not-found.tsx",
+        "path": "*",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    }
+  },
+  "reactRouterConfig": {
+    "appDirectory": "D:/zDev/actualize-app/apps/web/src/app",
+    "basename": "/",
+    "buildDirectory": "D:/zDev/actualize-app/apps/web/build",
+    "future": {
+      "unstable_optimizeDeps": false,
+      "unstable_subResourceIntegrity": false,
+      "unstable_trailingSlashAwareDataRequests": false,
+      "v8_middleware": false,
+      "v8_splitRouteModules": false,
+      "v8_viteEnvironmentApi": false
+    },
+    "prerender": false,
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "root.tsx",
+        "path": ""
+      },
+      "page": {
+        "id": "page",
+        "parentId": "root",
+        "file": "./page.jsx",
+        "index": true
+      },
+      "account/logout/page": {
+        "id": "account/logout/page",
+        "parentId": "root",
+        "file": "./account/logout/page.jsx",
+        "path": "account/logout"
+      },
+      "account/signin/page": {
+        "id": "account/signin/page",
+        "parentId": "root",
+        "file": "./account/signin/page.jsx",
+        "path": "account/signin"
+      },
+      "account/signup/page": {
+        "id": "account/signup/page",
+        "parentId": "root",
+        "file": "./account/signup/page.jsx",
+        "path": "account/signup"
+      },
+      "assessment/page": {
+        "id": "assessment/page",
+        "parentId": "root",
+        "file": "./assessment/page.jsx",
+        "path": "assessment"
+      },
+      "assessment-intro/page": {
+        "id": "assessment-intro/page",
+        "parentId": "root",
+        "file": "./assessment-intro/page.jsx",
+        "path": "assessment-intro"
+      },
+      "dashboard/page": {
+        "id": "dashboard/page",
+        "parentId": "root",
+        "file": "./dashboard/page.jsx",
+        "path": "dashboard"
+      },
+      "history/page": {
+        "id": "history/page",
+        "parentId": "root",
+        "file": "./history/page.jsx",
+        "path": "history"
+      },
+      "profile/page": {
+        "id": "profile/page",
+        "parentId": "root",
+        "file": "./profile/page.jsx",
+        "path": "profile"
+      },
+      "results/page": {
+        "id": "results/page",
+        "parentId": "root",
+        "file": "./results/page.jsx",
+        "path": "results"
+      },
+      "welcome/page": {
+        "id": "welcome/page",
+        "parentId": "root",
+        "file": "./welcome/page.jsx",
+        "path": "welcome"
+      },
+      "__create/not-found": {
+        "id": "__create/not-found",
+        "parentId": "root",
+        "file": "./__create/not-found.tsx",
+        "path": "*"
+      }
+    },
+    "routeDiscovery": {
+      "mode": "lazy",
+      "manifestPath": "/__manifest"
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true,
+    "allowedActionOrigins": false,
+    "unstable_routeConfig": [
+      {
+        "id": "root",
+        "path": "",
+        "file": "root.tsx",
+        "children": [
+          {
+            "index": true,
+            "file": "./page.jsx"
+          },
+          {
+            "path": "account/logout",
+            "file": "./account/logout/page.jsx"
+          },
+          {
+            "path": "account/signin",
+            "file": "./account/signin/page.jsx"
+          },
+          {
+            "path": "account/signup",
+            "file": "./account/signup/page.jsx"
+          },
+          {
+            "path": "assessment",
+            "file": "./assessment/page.jsx"
+          },
+          {
+            "path": "assessment-intro",
+            "file": "./assessment-intro/page.jsx"
+          },
+          {
+            "path": "dashboard",
+            "file": "./dashboard/page.jsx"
+          },
+          {
+            "path": "history",
+            "file": "./history/page.jsx"
+          },
+          {
+            "path": "profile",
+            "file": "./profile/page.jsx"
+          },
+          {
+            "path": "results",
+            "file": "./results/page.jsx"
+          },
+          {
+            "path": "welcome",
+            "file": "./welcome/page.jsx"
+          },
+          {
+            "path": "*",
+            "file": "./__create/not-found.tsx"
+          }
+        ]
+      }
+    ]
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}
