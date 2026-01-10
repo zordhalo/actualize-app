@@ -1,11 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "cd apps/web && pnpm build",
-  "outputDirectory": "apps/web/build/client",
-  "installCommand": "pnpm install",
+  "devCommand": "pnpm dev",
+  "buildCommand": "pnpm build",
+  "outputDirectory": "build/client",
+  "framework": null,
   
   "functions": {
-    "apps/web/api/**/*.ts": {
+    "api/**/*.ts": {
       "memory": 1024,
       "maxDuration": 10
     }
@@ -14,7 +15,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "/apps/web/api/:path*"
+      "destination": "/api/:path*"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/"
     }
   ],
   
@@ -40,7 +45,5 @@
         }
       ]
     }
-  ],
-  
-  "regions": ["iad1"]
+  ]
 }

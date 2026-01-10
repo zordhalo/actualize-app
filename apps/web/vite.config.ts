@@ -80,5 +80,12 @@ export default defineConfig({
     warmup: {
       clientFiles: ['./src/app/**/*', './src/app/root.tsx', './src/app/routes.ts'],
     },
+    // Proxy API requests to local API server in development
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+    },
   },
 });
