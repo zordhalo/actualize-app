@@ -79,6 +79,10 @@ export default defineConfig({
     dedupe: ['react', 'react-dom'],
   },
   clearScreen: false,
+  ssr: {
+    // Force Vite to bundle CommonJS modules that don't work well with ESM
+    noExternal: ['react-idle-timer'],
+  },
   server: {
     allowedHosts: true,
     host: '0.0.0.0',
