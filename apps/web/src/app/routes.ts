@@ -3,17 +3,18 @@ import type { RouteConfigEntry } from '@react-router/dev/routes';
 /**
  * Static route configuration for React Router.
  * 
- * Better Auth API routes (/api/auth/*) are now handled natively by React Router
- * using the api.auth.$.tsx route with actions (POST) and loaders (GET).
+ * Authentication is now handled by Clerk.
+ * Sign-in and sign-up routes use Clerk's embedded components.
  */
 const routes: RouteConfigEntry[] = [
 	// Index route
 	{ index: true, file: './page.jsx' },
 	
-	// API route for Better Auth - MUST come before account routes
-	{ path: 'api/auth/*', file: './api.auth.$.tsx' },
+	// Clerk authentication routes
+	{ path: 'sign-in/*', file: './sign-in/page.tsx' },
+	{ path: 'sign-up/*', file: './sign-up/page.tsx' },
 	
-	// Account routes
+	// Legacy account routes (redirect to new Clerk routes)
 	{ path: 'account/logout', file: './account/logout/page.jsx' },
 	{ path: 'account/signin', file: './account/signin/page.jsx' },
 	{ path: 'account/signup', file: './account/signup/page.jsx' },

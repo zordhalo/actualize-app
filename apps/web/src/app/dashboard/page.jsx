@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
-import { useAuth } from "@/auth/AuthProvider";
+import { useAuth, useUser as useClerkUser } from "@clerk/clerk-react";
 import useUser from "@/utils/useUser";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import actualizeLogo from "../../../../../brand/actualizeFullTextwLogo.png";
@@ -9,7 +9,8 @@ import actualizeArrowsIcon from "../../../../../brand/actualizeIconArrowsNBG.png
 import actualizeBoltIcon from "../../../../../brand/actualizeIconBoltNBG.png";
 
 function DashboardContent() {
-  const { user: sessionUser } = useAuth();
+  const { isSignedIn } = useAuth();
+  const { user: clerkUser } = useClerkUser();
   const { data: user, loading: userLoading } = useUser();
   const [latestAssessment, setLatestAssessment] = useState(null);
   const [loading, setLoading] = useState(true);

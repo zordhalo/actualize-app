@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useAuth } from "@/auth/AuthProvider";
+import { useAuth } from "@clerk/clerk-react";
 import useUser from "@/utils/useUser";
 import useAuthHook from "@/utils/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -9,7 +9,8 @@ import actualizeArrowsIcon from "../../../../../brand/actualizeIconArrowsNBG.png
 import actualizeBoltIcon from "../../../../../brand/actualizeIconBoltNBG.png";
 
 function ProfileContent() {
-  const { loading } = useAuth();
+  const { isLoaded } = useAuth();
+  const loading = !isLoaded;
   const { data: user, loading: userLoading } = useUser();
   const { signOut } = useAuthHook();
   const navigate = useNavigate();

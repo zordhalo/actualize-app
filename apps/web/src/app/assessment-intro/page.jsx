@@ -1,9 +1,10 @@
 import { Link, useNavigate } from "react-router";
-import { useAuth } from "@/auth/AuthProvider";
+import { useAuth } from "@clerk/clerk-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 function AssessmentIntroContent() {
-  const { loading } = useAuth();
+  const { isLoaded } = useAuth();
+  const loading = !isLoaded;
   const navigate = useNavigate();
 
   const dimensions = [

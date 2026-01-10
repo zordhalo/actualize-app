@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useAuth } from "@/auth/AuthProvider";
+import { useAuth } from "@clerk/clerk-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 function AssessmentContent() {
-  const { loading: authLoading } = useAuth();
+  const { isLoaded } = useAuth();
+  const authLoading = !isLoaded;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);

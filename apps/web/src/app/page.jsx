@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useAuth } from "@/auth/AuthProvider";
+import { useAuth } from "@clerk/clerk-react";
 
 export default function Page() {
-  const { user, loading } = useAuth();
+  const { isLoaded, isSignedIn } = useAuth();
+  const loading = !isLoaded;
+  const user = isSignedIn;
   const navigate = useNavigate();
 
   useEffect(() => {

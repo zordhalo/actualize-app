@@ -1,128 +1,105 @@
 import { useCallback } from 'react';
-import { authClient } from "@/lib/auth-client";
-import { useAuth as useBetterAuthContext } from "@/auth/AuthProvider";
+import { useAuth as useClerkAuth, useClerk } from '@clerk/clerk-react';
+import { useNavigate } from 'react-router';
 
 /**
  * Custom hook for authentication operations.
- * Uses Better Auth for all authentication in Vercel serverless environment.
+ * Uses Clerk for all authentication.
  * 
  * @example
  * const { signInWithCredentials, signOut } = useAuth();
  * 
- * // Sign in
- * const result = await signInWithCredentials({ email, password });
- * if (result.ok) {
- *   // Success - redirect or update UI
- * }
+ * // Sign in (redirects to Clerk sign-in page)
+ * signInWithCredentials({ callbackUrl: '/dashboard' });
  */
 function useAuth() {
+  const { isLoaded, isSignedIn, userId } = useClerkAuth();
+  const { signOut: clerkSignOut, openSignIn, openSignUp } = useClerk();
+  const navigate = useNavigate();
+
   const callbackUrl = typeof window !== 'undefined' 
     ? new URLSearchParams(window.location.search).get('callbackUrl')
     : null;
 
-  const { refresh: refreshAuth } = useBetterAuthContext();
-
-  const signInWithCredentials = useCallback(async (options) => {
+  const signInWithCredentials = useCallback(async (options = {}) => {
     try {
-      const { data, error } = await authClient.signIn.email({
-        email: options.email,
-        password: options.password,
-      });
-      
-      if (error) {
-        return { error: error?.message || "Failed to sign in" };
-      }
-      
-      await refreshAuth();
-      const redirectUrl = callbackUrl ?? options.callbackUrl ?? "/";
+      // Redirect to Clerk's sign-in page
+      const redirectUrl = callbackUrl ?? options.callbackUrl ?? "/dashboard";
       
       if (options.redirect !== false) {
-        window.location.href = redirectUrl;
+        navigate(`/sign-in?redirect_url=${encodeURIComponent(redirectUrl)}`);
+      } else {
+        openSignIn({ afterSignInUrl: redirectUrl });
       }
       
-      return { ok: true, url: redirectUrl, data };
+      return { ok: true, url: redirectUrl };
     } catch (error) {
-      return { error: error?.message || "Failed to sign in" };
+      return { error: error?.message || "Failed to initiate sign in" };
     }
-  }, [callbackUrl, refreshAuth]);
+  }, [callbackUrl, navigate, openSignIn]);
 
-  const signUpWithCredentials = useCallback(async (options) => {
+  const signUpWithCredentials = useCallback(async (options = {}) => {
     try {
-      const { data, error } = await authClient.signUp.email({
-        name: options.name || "",
-        email: options.email,
-        password: options.password,
-      });
-      
-      if (error) {
-        return { error: error?.message || "Failed to sign up" };
-      }
-      
-      await refreshAuth();
-      const redirectUrl = callbackUrl ?? options.callbackUrl ?? "/";
+      // Redirect to Clerk's sign-up page
+      const redirectUrl = callbackUrl ?? options.callbackUrl ?? "/welcome";
       
       if (options.redirect !== false) {
-        window.location.href = redirectUrl;
+        navigate(`/sign-up?redirect_url=${encodeURIComponent(redirectUrl)}`);
+      } else {
+        openSignUp({ afterSignUpUrl: redirectUrl });
       }
       
-      return { ok: true, url: redirectUrl, data };
+      return { ok: true, url: redirectUrl };
     } catch (error) {
-      return { error: error?.message || "Failed to sign up" };
+      return { error: error?.message || "Failed to initiate sign up" };
     }
-  }, [callbackUrl, refreshAuth]);
+  }, [callbackUrl, navigate, openSignUp]);
 
   const signInWithGitHub = useCallback(async (options = {}) => {
     try {
-      await authClient.signIn.social({
-        provider: "github",
-        callbackURL: callbackUrl ?? options.callbackUrl ?? "/",
-      });
+      const redirectUrl = callbackUrl ?? options.callbackUrl ?? "/dashboard";
+      // Clerk handles OAuth through the SignIn component
+      navigate(`/sign-in?redirect_url=${encodeURIComponent(redirectUrl)}`);
       return { ok: true };
     } catch (error) {
       return { error: error?.message || "Failed to sign in with GitHub" };
     }
-  }, [callbackUrl]);
+  }, [callbackUrl, navigate]);
 
   const signInWithGoogle = useCallback(async (options = {}) => {
     try {
-      await authClient.signIn.social({
-        provider: "google",
-        callbackURL: callbackUrl ?? options.callbackUrl ?? "/",
-      });
+      const redirectUrl = callbackUrl ?? options.callbackUrl ?? "/dashboard";
+      // Clerk handles OAuth through the SignIn component
+      navigate(`/sign-in?redirect_url=${encodeURIComponent(redirectUrl)}`);
       return { ok: true };
     } catch (error) {
       return { error: error?.message || "Failed to sign in with Google" };
     }
-  }, [callbackUrl]);
+  }, [callbackUrl, navigate]);
   
   const signInWithFacebook = useCallback(async (options = {}) => {
     try {
-      await authClient.signIn.social({
-        provider: "facebook",
-        callbackURL: callbackUrl ?? options.callbackUrl ?? "/",
-      });
+      const redirectUrl = callbackUrl ?? options.callbackUrl ?? "/dashboard";
+      navigate(`/sign-in?redirect_url=${encodeURIComponent(redirectUrl)}`);
       return { ok: true };
     } catch (error) {
       return { error: error?.message || "Failed to sign in with Facebook" };
     }
-  }, [callbackUrl]);
+  }, [callbackUrl, navigate]);
   
   const signInWithTwitter = useCallback(async (options = {}) => {
     try {
-      await authClient.signIn.social({
-        provider: "twitter",
-        callbackURL: callbackUrl ?? options.callbackUrl ?? "/",
-      });
+      const redirectUrl = callbackUrl ?? options.callbackUrl ?? "/dashboard";
+      navigate(`/sign-in?redirect_url=${encodeURIComponent(redirectUrl)}`);
       return { ok: true };
     } catch (error) {
       return { error: error?.message || "Failed to sign in with Twitter" };
     }
-  }, [callbackUrl]);
+  }, [callbackUrl, navigate]);
 
   const handleSignOut = useCallback(async (options = {}) => {
     try {
-      await authClient.signOut();
-      await refreshAuth();
+      await clerkSignOut();
       
       if (options.redirect !== false) {
         window.location.href = options.callbackUrl || "/";
@@ -132,9 +109,12 @@ function useAuth() {
     } catch (error) {
       return { error: error?.message || "Failed to sign out" };
     }
-  }, [refreshAuth]);
+  }, [clerkSignOut]);
 
   return {
+    isLoaded,
+    isSignedIn,
+    userId,
     signInWithCredentials,
     signUpWithCredentials,
     signInWithGitHub,

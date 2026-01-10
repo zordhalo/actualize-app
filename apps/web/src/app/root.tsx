@@ -23,7 +23,7 @@ import './global.css';
 
 import { toPng } from 'html-to-image';
 import fetch from '@/__create/fetch';
-import { AuthProvider } from '@/auth/AuthProvider';
+import { ClerkAuthProvider } from '@/auth/ClerkAuthProvider';
 import { useNavigate } from 'react-router';
 import { serializeError } from 'serialize-error';
 import { Toaster } from 'sonner';
@@ -483,10 +483,10 @@ export function Layout({ children }: { children: ReactNode }) {
 }
 
 export default function App() {
-  // Use Better Auth AuthProvider - it gracefully handles cases where Better Auth is not configured
+  // Use Clerk for authentication
   return (
-    <AuthProvider>
+    <ClerkAuthProvider>
       <Outlet />
-    </AuthProvider>
+    </ClerkAuthProvider>
   );
 }

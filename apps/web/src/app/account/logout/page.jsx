@@ -1,13 +1,24 @@
-import useAuth from "@/utils/useAuth";
+import { useEffect } from "react";
+import { useClerk, useAuth } from "@clerk/clerk-react";
 
+/**
+ * Logout page - signs out using Clerk
+ */
 export default function LogoutPage() {
-  const { signOut } = useAuth();
+  const { signOut } = useClerk();
+  const { isSignedIn, isLoaded } = useAuth();
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      signOut({ redirectUrl: "/" });
+    } else if (isLoaded && !isSignedIn) {
+      // Already signed out, redirect to home
+      window.location.href = "/";
+    }
+  }, [isLoaded, isSignedIn, signOut]);
 
   const handleSignOut = async () => {
-    await signOut({
-      callbackUrl: "/",
-      redirect: true,
-    });
+    await signOut({ redirectUrl: "/" });
   };
 
   return (

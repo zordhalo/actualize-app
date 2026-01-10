@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useAuth } from "@/auth/AuthProvider";
+import { useAuth } from "@clerk/clerk-react";
 import useUser from "@/utils/useUser";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import actualizeIcon from "../../../../../brand/actualizeLogoNBG.avif";
@@ -8,7 +8,8 @@ import actualizeArrowsIcon from "../../../../../brand/actualizeIconArrowsNBG.png
 import actualizeBoltIcon from "../../../../../brand/actualizeIconBoltNBG.png";
 
 function HistoryContent() {
-  const { loading: authLoading } = useAuth();
+  const { isLoaded } = useAuth();
+  const authLoading = !isLoaded;
   const { data: user, loading: userLoading } = useUser();
   const navigate = useNavigate();
   const [assessments, setAssessments] = useState([]);

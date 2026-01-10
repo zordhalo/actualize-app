@@ -1,41 +1,29 @@
-import { getToken } from '@auth/core/jwt';
+import { auth } from "@/auth";
+
 export async function GET(request) {
-	const [token, jwt] = await Promise.all([
-		getToken({
-			req: request,
-			secret: process.env.AUTH_SECRET,
-			secureCookie: process.env.AUTH_URL?.startsWith('https') ?? false,
-			raw: true,
-		}),
-		getToken({
-			req: request,
-			secret: process.env.AUTH_SECRET,
-			secureCookie: process.env.AUTH_URL?.startsWith('https') ?? false,
-		}),
-	]);
+  const session = await auth();
 
-	if (!jwt) {
-		return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-			status: 401,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-	}
+  if (!session || !session.user?.id) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
 
-	return new Response(
-		JSON.stringify({
-			jwt: token,
-			user: {
-				id: jwt.sub,
-				email: jwt.email,
-				name: jwt.name,
-			},
-		}),
-		{
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		}
-	);
+  return new Response(
+    JSON.stringify({
+      user: {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+      },
+    }),
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
 }

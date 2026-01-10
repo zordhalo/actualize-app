@@ -8,6 +8,7 @@ export async function GET() {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Use Clerk user ID (prefixed with 'user_')
     const userId = session.user.id;
     const db = await getDb();
 

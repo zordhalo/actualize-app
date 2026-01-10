@@ -1,63 +1,52 @@
-import { getToken } from '@auth/core/jwt';
+import { auth } from "@/auth";
+
 export async function GET(request) {
-	const [token, jwt] = await Promise.all([
-		getToken({
-			req: request,
-			secret: process.env.AUTH_SECRET,
-			secureCookie: process.env.AUTH_URL?.startsWith('https') ?? false,
-			raw: true,
-		}),
-		getToken({
-			req: request,
-			secret: process.env.AUTH_SECRET,
-			secureCookie: process.env.AUTH_URL?.startsWith('https') ?? false,
-		}),
-	]);
+  const session = await auth();
 
-	if (!jwt) {
-		return new Response(
-			`
-			<html>
-				<body>
-					<script>
-						window.parent.postMessage({ type: 'AUTH_ERROR', error: 'Unauthorized' }, '*');
-					</script>
-				</body>
-			</html>
-			`,
-			{
-				status: 401,
-				headers: {
-					'Content-Type': 'text/html',
-				},
-			}
-		);
-	}
+  if (!session || !session.user?.id) {
+    return new Response(
+      `
+      <html>
+        <body>
+          <script>
+            window.parent.postMessage({ type: 'AUTH_ERROR', error: 'Unauthorized' }, '*');
+          </script>
+        </body>
+      </html>
+      `,
+      {
+        status: 401,
+        headers: {
+          'Content-Type': 'text/html',
+        },
+      }
+    );
+  }
 
-	const message = {
-		type: 'AUTH_SUCCESS',
-		jwt: token,
-		user: {
-			id: jwt.sub,
-			email: jwt.email,
-			name: jwt.name,
-		},
-	};
+  const message = {
+    type: 'AUTH_SUCCESS',
+    user: {
+      id: session.user.id,
+      email: session.user.email,
+      name: session.user.name,
+    },
+  };
 
-	return new Response(
-		`
-		<html>
-			<body>
-				<script>
-					window.parent.postMessage(${JSON.stringify(message)}, '*');
-				</script>
-			</body>
-		</html>
-		`,
-		{
-			headers: {
-				'Content-Type': 'text/html',
-			},
-		}
-	);
+  return new Response(
+    `
+    <html>
+      <body>
+        <script>
+          window.parent.postMessage(${JSON.stringify(message)}, '*');
+        </script>
+        <p>Authentication successful. You can close this window.</p>
+      </body>
+    </html>
+    `,
+    {
+      headers: {
+        'Content-Type': 'text/html',
+      },
+    }
+  );
 }

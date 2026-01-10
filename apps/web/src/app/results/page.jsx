@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router";
-import { useAuth } from "@/auth/AuthProvider";
+import { useAuth } from "@clerk/clerk-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import actualizeIcon from "../../../../../brand/actualizeLogoNBG.avif";
 
 function ResultsContent() {
-  const { loading } = useAuth();
+  const { isLoaded } = useAuth();
+  const loading = !isLoaded;
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 

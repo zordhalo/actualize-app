@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router";
-import { useAuth as useBetterAuth } from "@/auth/AuthProvider";
+import { useAuth } from "@clerk/clerk-react";
 
 /**
  * ProtectedRoute component - wraps pages that require authentication
@@ -20,26 +20,26 @@ import { useAuth as useBetterAuth } from "@/auth/AuthProvider";
  *   <Route path="dashboard" element={<DashboardPage />} />
  * </Route>
  */
-export default function ProtectedRoute({ children, redirectTo = "/account/signin" }) {
+export default function ProtectedRoute({ children, redirectTo = "/sign-in" }) {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Use Better Auth
-  const { user, loading } = useBetterAuth();
+  // Use Clerk
+  const { isLoaded, isSignedIn } = useAuth();
 
   useEffect(() => {
     // Wait for auth to load
-    if (loading) return;
+    if (!isLoaded) return;
 
     // If not authenticated, redirect to sign in with callback URL
-    if (!user) {
+    if (!isSignedIn) {
       const callbackUrl = encodeURIComponent(location.pathname + location.search);
-      navigate(`${redirectTo}?callbackUrl=${callbackUrl}`, { replace: true });
+      navigate(`${redirectTo}?redirect_url=${callbackUrl}`, { replace: true });
     }
-  }, [user, loading, navigate, location, redirectTo]);
+  }, [isSignedIn, isLoaded, navigate, location, redirectTo]);
 
   // Show loading spinner while checking authentication
-  if (loading) {
+  if (!isLoaded) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
         <div className="w-8 h-8 border-4 border-[#d90428] border-t-transparent rounded-full animate-spin" />
@@ -48,7 +48,7 @@ export default function ProtectedRoute({ children, redirectTo = "/account/signin
   }
 
   // If not authenticated, show loading (will redirect via useEffect)
-  if (!user) {
+  if (!isSignedIn) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
         <div className="w-8 h-8 border-4 border-[#d90428] border-t-transparent rounded-full animate-spin" />
@@ -64,13 +64,13 @@ export default function ProtectedRoute({ children, redirectTo = "/account/signin
  * Hook for checking authentication status
  * Returns: { isAuthenticated, isLoading, user, session }
  */
-export function useAuth() {
-  const auth = useBetterAuth();
+export function useAuthStatus() {
+  const { isLoaded, isSignedIn, userId } = useAuth();
   return {
-    isAuthenticated: !!auth.user,
-    isLoading: auth.loading,
-    user: auth.user,
-    session: auth.user ? { user: auth.user } : null,
+    isAuthenticated: isSignedIn,
+    isLoading: !isLoaded,
+    user: isSignedIn ? { id: userId } : null,
+    session: isSignedIn ? { user: { id: userId } } : null,
   };
 }
 
@@ -78,23 +78,23 @@ export function useAuth() {
  * Hook for requiring authentication - redirects if not authenticated
  * Use this in pages that need auth but don't want to wrap with ProtectedRoute
  */
-export function useRequireAuth(redirectTo = "/account/signin") {
+export function useRequireAuth(redirectTo = "/sign-in") {
   const navigate = useNavigate();
   const location = useLocation();
-  const auth = useAuth();
+  const { isLoaded, isSignedIn, userId } = useAuth();
 
   useEffect(() => {
-    if (auth.isLoading) return;
+    if (!isLoaded) return;
     
-    if (!auth.isAuthenticated) {
+    if (!isSignedIn) {
       const callbackUrl = encodeURIComponent(location.pathname + location.search);
-      navigate(`${redirectTo}?callbackUrl=${callbackUrl}`, { replace: true });
+      navigate(`${redirectTo}?redirect_url=${callbackUrl}`, { replace: true });
     }
-  }, [auth.isLoading, auth.isAuthenticated, navigate, location, redirectTo]);
+  }, [isLoaded, isSignedIn, navigate, location, redirectTo]);
 
   return {
-    isAuthenticated: auth.isAuthenticated,
-    isLoading: auth.isLoading,
-    user: auth.user,
+    isAuthenticated: isSignedIn,
+    isLoading: !isLoaded,
+    user: isSignedIn ? { id: userId } : null,
   };
 }
