@@ -8,7 +8,7 @@ import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { parse } from 'url';
 import { readFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -121,15 +121,19 @@ async function loadHandler(apiPath: string): Promise<((req: VercelRequest, res: 
     // Try folder/index pattern
     const indexPath = join(__dirname, apiPath.replace(/^\//, ''), 'index.ts');
     if (existsSync(indexPath)) {
-      const module = await import(indexPath);
+      // Convert Windows path to file:// URL for proper ESM import
+      const fileUrl = pathToFileURL(indexPath).href;
+      const module = await import(fileUrl);
       return module.default;
     }
     return null;
   }
   
   try {
-    // Dynamic import with cache busting for development
-    const module = await import(`${fullPath}?update=${Date.now()}`);
+    // Convert Windows path to file:// URL for proper ESM import
+    // This is required because dynamic import() on Windows requires file:// URLs
+    const fileUrl = pathToFileURL(fullPath).href;
+    const module = await import(`${fileUrl}?update=${Date.now()}`);
     return module.default;
   } catch (error) {
     console.error(`Error loading handler for ${apiPath}:`, error);
