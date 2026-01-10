@@ -110,6 +110,7 @@ actualize-app/
 
 - [Web App Documentation](./apps/web/README.md)
 - [Mobile App Documentation](./apps/mobile/README.md)
+- [Brand Guidelines](./docs/BRAND_GUIDELINES.md)
 - [API Documentation](./docs/API.md) _(to be created)_
 - [Database Schema](./docs/DATABASE.md) _(to be created)_
 
