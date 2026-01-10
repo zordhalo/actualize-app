@@ -1,4 +1,4 @@
-import { readdirSync, statSync } from 'node:fs';
+import { readdirSync, statSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -9,6 +9,17 @@ import {
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
+// Directories to exclude from route generation
+const EXCLUDED_DIRS = new Set([
+	'__create',
+	'__tests__',
+	'api',
+	'components',
+	'utils',
+	'node_modules',
+	'.git',
+]);
+
 type Tree = {
 	path: string;
 	children: Tree[];
@@ -18,7 +29,28 @@ type Tree = {
 	isCatchAll: boolean;
 };
 
-function buildRouteTree(dir: string, basePath = ''): Tree {
+function buildRouteTree(dir: string, basePath = '', visited = new Set<string>()): Tree {
+	// Resolve symlinks and check for circular references
+	let realDir: string;
+	try {
+		realDir = realpathSync(dir);
+	} catch {
+		realDir = dir;
+	}
+	
+	// Skip if we've already visited this directory (circular reference protection)
+	if (visited.has(realDir)) {
+		return {
+			path: basePath,
+			children: [],
+			hasPage: false,
+			isParam: false,
+			isCatchAll: false,
+			paramName: '',
+		};
+	}
+	visited.add(realDir);
+
 	const files = readdirSync(dir);
 	const node: Tree = {
 		path: basePath,
@@ -45,16 +77,24 @@ function buildRouteTree(dir: string, basePath = ''): Tree {
 	}
 
 	for (const file of files) {
+		// Skip excluded directories
+		if (EXCLUDED_DIRS.has(file)) {
+			continue;
+		}
+		
 		const filePath = join(dir, file);
 		const stat = statSync(filePath);
 
 		if (stat.isDirectory()) {
 			const childPath = basePath ? `${basePath}/${file}` : file;
-			const childNode = buildRouteTree(filePath, childPath);
-			node.children.push(childNode);
+			const childNode = buildRouteTree(filePath, childPath, visited);
+			// Only add child nodes that have pages or have children with pages
+			if (childNode.hasPage || childNode.children.length > 0) {
+				node.children.push(childNode);
+			}
 		} else if (file === 'page.jsx') {
 			node.hasPage = true;
-    }
+		}
 	}
 
 	return node;
@@ -112,8 +152,13 @@ if (import.meta.env.DEV) {
 		});
 	}
 }
-const tree = buildRouteTree(__dirname);
-const notFound = route('*?', './__create/not-found.tsx');
-const routes = [...generateRoutes(tree), notFound];
+
+// Build route tree with a fresh visited set for each build
+const tree = buildRouteTree(__dirname, '', new Set<string>());
+const generatedRoutes = generateRoutes(tree);
+const notFound = route('*', './__create/not-found.tsx');
+
+// Combine routes - generated routes first, then catch-all
+const routes: RouteConfigEntry[] = [...generatedRoutes, notFound];
 
 export default routes;
