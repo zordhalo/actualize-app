@@ -18,6 +18,16 @@ import { getHTMLForErrorPage } from './get-html-for-error-page';
 import { isAuthAction } from './is-auth-action';
 import { API_BASENAME, api } from './route-builder';
 
+// Better Auth integration
+let betterAuthInstance: any = null;
+try {
+  // Dynamic import to avoid errors if better-auth is not installed
+  const { auth } = await import('../src/lib/auth');
+  betterAuthInstance = auth;
+} catch (error) {
+  console.warn('[auth] Better Auth not available, falling back to Auth.js:', error);
+}
+
 const als = new AsyncLocalStorage<{ requestId: string }>();
 
 for (const method of ['log', 'info', 'warn', 'error', 'debug'] as const) {
@@ -72,11 +82,22 @@ app.onError((err, c) => {
   return c.html(getHTMLForErrorPage(err), 500);
 });
 
+// CORS configuration - must come before routes for Better Auth cookies to work
 if (process.env.CORS_ORIGINS) {
   app.use(
     '/*',
     cors({
       origin: process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim()),
+      credentials: true, // Required for Better Auth cookies
+    })
+  );
+} else {
+  // Default CORS for development if CORS_ORIGINS not set
+  app.use(
+    '/api/*',
+    cors({
+      origin: process.env.BETTER_AUTH_URL || process.env.AUTH_URL || 'http://localhost:3000',
+      credentials: true,
     })
   );
 }
@@ -322,7 +343,33 @@ app.all('/integrations/:path{.+}', async (c, next) => {
   });
 });
 
+// Better Auth handler - mounted at /api/auth/* for both GET and POST
+// This takes precedence over Auth.js when Better Auth is enabled
+if (betterAuthInstance && (process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET)) {
+  app.on(['GET', 'POST'], '/api/auth/*', async (c) => {
+    try {
+      const response = await betterAuthInstance.handler(c.req.raw);
+      return response;
+    } catch (error) {
+      console.error('[auth] Better Auth handler error:', error);
+      return c.json(
+        {
+          error: 'Authentication error',
+          message: error instanceof Error ? error.message : 'Unknown auth error',
+        },
+        500
+      );
+    }
+  });
+}
+
+// Legacy Auth.js handler - fallback if Better Auth is not enabled
 app.use('/api/auth/*', async (c, next) => {
+  // Skip if Better Auth already handled this request
+  if (betterAuthInstance && (process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET)) {
+    return next();
+  }
+  
   if (isAuthAction(c.req.path)) {
     try {
       return await authHandler()(c, next);
