@@ -1,6 +1,6 @@
 // apps/web/src/lib/auth.ts
 import { betterAuth } from "better-auth";
-import { mongoDbAdapter } from "better-auth/mongodb";
+import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { organization } from "better-auth/plugins/organization";
 import { twoFactor } from "better-auth/plugins/two-factor";
 import { MongoClient } from "mongodb";
@@ -93,7 +93,7 @@ export const auth = betterAuth({
       : "http://localhost:3000"),
 
   // Database adapter with serverless-optimized connection
-  database: mongoDbAdapter(getMongoClient, {
+  database: mongodbAdapter(getMongoClient, {
     dbName: getDatabaseName(),
   }),
 
