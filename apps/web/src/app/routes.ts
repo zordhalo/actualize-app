@@ -3,17 +3,15 @@ import type { RouteConfigEntry } from '@react-router/dev/routes';
 /**
  * Static route configuration for React Router.
  * 
- * IMPORTANT: API routes (/api/*) are NOT handled by React Router.
- * They are handled by:
- * - Local dev: Hono server in __create/index.ts
- * - Vercel: Dedicated Vercel Functions in api/ directory
- * 
- * The catch-all route excludes /api/* paths to prevent 405 errors
- * when Better Auth makes POST requests to /api/auth/*.
+ * Better Auth API routes (/api/auth/*) are now handled natively by React Router
+ * using the api.auth.$.tsx route with actions (POST) and loaders (GET).
  */
 const routes: RouteConfigEntry[] = [
 	// Index route
 	{ index: true, file: './page.jsx' },
+	
+	// API route for Better Auth - MUST come before account routes
+	{ path: 'api/auth/*', file: './api.auth.$.tsx' },
 	
 	// Account routes
 	{ path: 'account/logout', file: './account/logout/page.jsx' },

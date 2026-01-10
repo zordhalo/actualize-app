@@ -7,7 +7,7 @@ import { twoFactorClient } from "better-auth/client/plugins";
  * Better Auth client for React components.
  *
  * This client:
- * - Communicates with /api/auth/* endpoints (served by Vercel Function)
+ * - Communicates with /api/auth/* endpoints (handled by React Router actions/loaders)
  * - Handles cookie-based sessions automatically
  * - Provides React hooks for auth state
  *
@@ -28,7 +28,7 @@ import { twoFactorClient } from "better-auth/client/plugins";
 
 /**
  * Get the base URL for Better Auth.
- * - Server-side (SSR on Vercel): Uses environment variables
+ * - Server-side (SSR): Uses environment variables for absolute URL
  * - Client-side (browser): Uses relative URL which works on same origin
  */
 const getBaseURL = () => {
@@ -49,7 +49,7 @@ const getBaseURL = () => {
   }
 
   // Client-side: use same origin (empty string = relative URL)
-  // This works because the API is served from the same Hono server
+  // This works because the API is served from the same React Router app
   return "";
 };
 

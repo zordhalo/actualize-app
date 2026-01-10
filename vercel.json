@@ -3,13 +3,6 @@
   "buildCommand": "pnpm build",
   "installCommand": "pnpm install",
   
-  "rewrites": [
-    {
-      "source": "/api/auth/(.*)",
-      "destination": "/api/auth/[...auth]"
-    }
-  ],
-  
   "headers": [
     {
       "source": "/api/(.*)",
@@ -33,13 +26,6 @@
       ]
     }
   ],
-  
-  "functions": {
-    "api/auth/[...auth].ts": {
-      "maxDuration": 10,
-      "memory": 256
-    }
-  },
   
   "regions": ["iad1"]
 }
