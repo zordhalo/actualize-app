@@ -6,7 +6,7 @@
  */
 
 import type { VercelRequest } from '@vercel/node';
-import { createClerkClient } from '@clerk/backend';
+import { createClerkClient, verifyToken } from '@clerk/backend';
 
 // Session type that matches what API routes expect
 export interface Session {
@@ -48,8 +48,10 @@ export async function getSession(req: VercelRequest): Promise<Session | null> {
       return null;
     }
 
-    // Verify the JWT token
-    const { sub: userId } = await clerkClient.verifyToken(sessionToken);
+    // Verify the JWT token using the standalone function
+    const { sub: userId } = await verifyToken(sessionToken, {
+      secretKey,
+    });
 
     if (!userId) {
       return null;
