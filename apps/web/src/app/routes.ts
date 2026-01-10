@@ -1,4 +1,4 @@
-import { readdirSync, statSync } from 'node:fs';
+import { readdirSync, statSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -18,7 +18,25 @@ type Tree = {
 	isCatchAll: boolean;
 };
 
-function buildRouteTree(dir: string, basePath = ''): Tree {
+function buildRouteTree(dir: string, basePath = '', visited = new Set<string>()): Tree {
+	// Get the real path to handle symlinks and prevent circular references
+	const realDir = realpathSync(dir);
+	
+	// Check if we've already visited this directory
+	if (visited.has(realDir)) {
+		return {
+			path: basePath,
+			children: [],
+			hasPage: false,
+			isParam: false,
+			isCatchAll: false,
+			paramName: '',
+		};
+	}
+	
+	// Mark this directory as visited
+	visited.add(realDir);
+	
 	const files = readdirSync(dir);
 	const node: Tree = {
 		path: basePath,
@@ -50,11 +68,11 @@ function buildRouteTree(dir: string, basePath = ''): Tree {
 
 		if (stat.isDirectory()) {
 			const childPath = basePath ? `${basePath}/${file}` : file;
-			const childNode = buildRouteTree(filePath, childPath);
+			const childNode = buildRouteTree(filePath, childPath, visited);
 			node.children.push(childNode);
 		} else if (file === 'page.jsx') {
 			node.hasPage = true;
-    }
+		}
 	}
 
 	return node;
@@ -83,10 +101,12 @@ function generateRoutes(node: Tree): RouteConfigEntry[] {
 					if (paramName.startsWith('...')) {
 						return '*'; // React Router's catch-all syntax
 					}
+
 					// Handle optional parameters (e.g., [[id]] becomes :id?)
 					if (paramName.startsWith('[') && paramName.endsWith(']')) {
 						return `:${paramName.slice(1, -1)}?`;
 					}
+
 					// Handle regular parameters (e.g., [id] becomes :id)
 					return `:${paramName}`;
 				}
@@ -104,6 +124,7 @@ function generateRoutes(node: Tree): RouteConfigEntry[] {
 
 	return routes;
 }
+
 if (import.meta.env.DEV) {
 	import.meta.glob('./**/page.jsx', {});
 	if (import.meta.hot) {
@@ -112,6 +133,7 @@ if (import.meta.env.DEV) {
 		});
 	}
 }
+
 const tree = buildRouteTree(__dirname);
 const notFound = route('*?', './__create/not-found.tsx');
 const routes = [...generateRoutes(tree), notFound];
