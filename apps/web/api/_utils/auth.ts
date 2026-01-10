@@ -6,6 +6,7 @@
  */
 
 import type { VercelRequest } from '@vercel/node';
+import { createClerkClient } from '@clerk/backend';
 
 // Session type that matches what API routes expect
 export interface Session {
@@ -32,70 +33,39 @@ export async function getSession(req: VercelRequest): Promise<Session | null> {
   }
 
   try {
+    const clerkClient = createClerkClient({ secretKey });
+    
     // Get the session token from various sources
     const authHeader = req.headers.authorization;
     const cookies = req.cookies;
-    const sessionCookie = cookies?.__session;
-    const clerkJwtCookie = cookies?.__clerk_db_jwt;
-    
     const sessionToken = (authHeader && authHeader.startsWith('Bearer ') 
       ? authHeader.replace('Bearer ', '') 
       : null)
-      || sessionCookie
-      || clerkJwtCookie;
+      || cookies?.__session
+      || cookies?.__clerk_db_jwt;
 
     if (!sessionToken) {
       return null;
     }
 
-    // Verify the session with Clerk's backend API
-    const verifyResponse = await fetch('https://api.clerk.com/v1/clients/verify', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${secretKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ token: sessionToken }),
-    });
+    // Verify the JWT token
+    const { sub: userId } = await clerkClient.verifyToken(sessionToken);
 
-    if (!verifyResponse.ok) {
+    if (!userId) {
       return null;
     }
 
-    const clientData = await verifyResponse.json();
-    if (clientData && clientData.sessions && clientData.sessions.length > 0) {
-      const activeSession = clientData.sessions.find((s: any) => s.status === 'active');
-      if (activeSession) {
-        // Fetch user details
-        const userResponse = await fetch(`https://api.clerk.com/v1/users/${activeSession.user_id}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${secretKey}`,
-            'Content-Type': 'application/json',
-          },
-        });
+    // Fetch user details
+    const user = await clerkClient.users.getUser(userId);
 
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          return {
-            user: {
-              id: userData.id,
-              email: userData.email_addresses?.[0]?.email_address,
-              name: `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || undefined,
-              image: userData.image_url,
-            },
-          };
-        }
-
-        return {
-          user: {
-            id: activeSession.user_id,
-          },
-        };
-      }
-    }
-
-    return null;
+    return {
+      user: {
+        id: user.id,
+        email: user.emailAddresses?.[0]?.emailAddress,
+        name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || undefined,
+        image: user.imageUrl,
+      },
+    };
   } catch (error) {
     console.error('[clerk] Auth check failed:', error);
     return null;
