@@ -13,7 +13,7 @@ import { requestId } from 'hono/request-id';
 import { createHonoServer } from 'react-router-hono-server/node';
 import { serializeError } from 'serialize-error';
 import MongoDBAdapter from './mongodb-adapter';
-import clientPromise from '../src/app/api/utils/mongodb';
+import clientPromise, { getDatabaseName } from '../src/app/api/utils/mongodb';
 import { getHTMLForErrorPage } from './get-html-for-error-page';
 import { isAuthAction } from './is-auth-action';
 import { API_BASENAME, api } from './route-builder';
@@ -33,7 +33,8 @@ for (const method of ['log', 'info', 'warn', 'error', 'debug'] as const) {
   };
 }
 
-const adapter = MongoDBAdapter(clientPromise);
+// Use database name from connection string or environment variable
+const adapter = MongoDBAdapter(clientPromise, { databaseName: getDatabaseName() });
 
 const app = new Hono();
 
@@ -172,6 +173,8 @@ if (process.env.AUTH_SECRET) {
             try {
               const user = await adapter.getUserByEmail(email);
               if (!user) {
+                console.error(`[auth] User not found for email: ${email}`);
+                console.error(`[auth] Database being used: ${getDatabaseName()}`);
                 return null;
               }
               const matchingAccount = user.accounts.find(
@@ -179,11 +182,13 @@ if (process.env.AUTH_SECRET) {
               );
               const accountPassword = matchingAccount?.password;
               if (!accountPassword) {
+                console.error(`[auth] No credentials account found for user: ${email}`);
                 return null;
               }
 
               const isValid = await verify(accountPassword, password);
               if (!isValid) {
+                console.error(`[auth] Password verification failed for user: ${email}`);
                 return null;
               }
 
@@ -228,32 +233,42 @@ if (process.env.AUTH_SECRET) {
               };
             }
 
-            // Real database auth
+            // Real database auth - check if user already exists
             try {
-              const user = await adapter.getUserByEmail(email);
-              if (!user) {
-                const newUser = await adapter.createUser({
-                  id: crypto.randomUUID(),
-                  emailVerified: null,
-                  email,
-                  name: typeof name === 'string' && name.length > 0 ? name : undefined,
-                  image: typeof image === 'string' && image.length > 0 ? image : undefined,
-                });
-                await adapter.linkAccount({
-                  extraData: {
-                    password: await hash(password),
-                  },
-                  type: 'credentials',
-                  userId: newUser.id,
-                  providerAccountId: newUser.id,
-                  provider: 'credentials',
-                });
-                return newUser;
+              const existingUser = await adapter.getUserByEmail(email);
+              if (existingUser) {
+                // User with this email already exists - throw error
+                throw new Error('EmailCreateAccount');
               }
-              return null;
+
+              // User doesn't exist - create new user
+              const newUser = await adapter.createUser({
+                id: crypto.randomUUID(),
+                emailVerified: null,
+                email,
+                name: typeof name === 'string' && name.length > 0 ? name : undefined,
+                image: typeof image === 'string' && image.length > 0 ? image : undefined,
+              });
+              
+              // Link credentials account with hashed password
+              await adapter.linkAccount({
+                extraData: {
+                  password: await hash(password),
+                },
+                type: 'credentials',
+                userId: newUser.id,
+                providerAccountId: newUser.id,
+                provider: 'credentials',
+              });
+              
+              return newUser;
             } catch (error) {
+              // Re-throw Auth.js error codes
+              if (error instanceof Error && error.message === 'EmailCreateAccount') {
+                throw error;
+              }
               console.error('Database signup failed:', error);
-              return null;
+              throw new Error('Callback');
             }
           },
         }),

@@ -6,7 +6,8 @@
 		"dev": "react-router dev",
 		"build": "react-router build",
 		"start": "react-router serve",
-		"typecheck": "react-router typegen && tsc --noEmit"
+		"typecheck": "react-router typegen && tsc --noEmit",
+		"test:mongodb": "node test-mongodb.js"
 	},
 	"dependencies": {
 		"@auth/core": "^0.37.2",

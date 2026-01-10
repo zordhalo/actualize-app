@@ -6,10 +6,11 @@
 import CreateAuth from "@auth/create"
 import Credentials from "@auth/core/providers/credentials"
 import MongoDBAdapter from "../__create/mongodb-adapter"
-import clientPromise from "./app/api/utils/mongodb"
+import clientPromise, { getDatabaseName } from "./app/api/utils/mongodb"
 import { hash, verify } from 'argon2'
 
-const adapter = MongoDBAdapter(clientPromise);
+// Use database name from connection string or environment variable
+const adapter = MongoDBAdapter(clientPromise, { databaseName: getDatabaseName() });
 
 export const { auth } = CreateAuth({
   providers: [Credentials({

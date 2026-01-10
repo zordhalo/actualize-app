@@ -67,7 +67,10 @@ export default function MongoDBAdapter(
 ): MongoDBAdapter {
   const getDb = async (): Promise<Db> => {
     const client = await clientPromise;
-    return client.db(options.databaseName);
+    // If databaseName is provided, use it; otherwise use database from connection string
+    return options.databaseName 
+      ? client.db(options.databaseName)
+      : client.db(); // Uses database from connection string
   };
 
   return {
@@ -104,6 +107,13 @@ export default function MongoDBAdapter(
 
     async createUser(user: Omit<AdapterUser, 'id'>) {
       const db = await getDb();
+      
+      // Check if user with this email already exists (duplicate check)
+      const existingUser = await db.collection('users').findOne({ email: user.email });
+      if (existingUser) {
+        throw new Error('User with this email already exists');
+      }
+      
       const result = await db.collection('users').insertOne({
         name: user.name,
         email: user.email,
@@ -133,22 +143,33 @@ export default function MongoDBAdapter(
 
     async getUserByEmail(email: string) {
       const db = await getDb();
-      const user = await db.collection('users').findOne({ email });
-      if (!user) return null;
+      const dbName = db.databaseName;
+      try {
+        const user = await db.collection('users').findOne({ email });
+        if (!user) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[mongodb-adapter] User not found: ${email} in database: ${dbName}`);
+          }
+          return null;
+        }
 
-      const accounts = await db
-        .collection('accounts')
-        .find({ userId: user._id.toHexString() })
-        .toArray();
+        const accounts = await db
+          .collection('accounts')
+          .find({ userId: user._id.toHexString() })
+          .toArray();
 
-      return {
-        ...(formatDoc(user) as AdapterUser),
-        accounts: accounts.map((acc) => ({
-          provider: acc.provider,
-          providerAccountId: acc.providerAccountId,
-          password: acc.password,
-        })),
-      };
+        return {
+          ...(formatDoc(user) as AdapterUser),
+          accounts: accounts.map((acc) => ({
+            provider: acc.provider,
+            providerAccountId: acc.providerAccountId,
+            password: acc.password,
+          })),
+        };
+      } catch (error) {
+        console.error(`[mongodb-adapter] Error getting user by email ${email} in database ${dbName}:`, error);
+        throw error;
+      }
     },
 
     async getUserByAccount({
