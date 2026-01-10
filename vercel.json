@@ -3,6 +3,19 @@
   "buildCommand": "pnpm build",
   "installCommand": "pnpm install",
   
+  "functions": {
+    "apps/web/api/**/*.ts": {
+      "runtime": "@vercel/node@3"
+    }
+  },
+  
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/apps/web/api/:path*"
+    }
+  ],
+  
   "headers": [
     {
       "source": "/api/(.*)",

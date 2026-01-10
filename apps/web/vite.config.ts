@@ -1,6 +1,5 @@
 import path from 'node:path';
 import { reactRouter } from '@react-router/dev/vite';
-import { reactRouterHonoServer } from 'react-router-hono-server/dev';
 import { defineConfig } from 'vite';
 import babel from 'vite-plugin-babel';
 import tsconfigPaths from 'vite-tsconfig-paths';
@@ -21,7 +20,6 @@ export default defineConfig({
     // don't want that to cause a re-bundle.
     include: ['fast-glob', 'lucide-react'],
     exclude: [
-      'hono/context-storage',
       'fsevents',
       'lightningcss',
     ],
@@ -30,11 +28,6 @@ export default defineConfig({
   plugins: [
     nextPublicProcessEnv(),
     restartEnvFileChange(),
-    // Hono server handles API routes and auth - always needed
-    reactRouterHonoServer({
-      serverEntryPoint: './__create/index.ts',
-      runtime: 'node',
-    }),
     babel({
       include: ['src/**/*.{js,jsx,ts,tsx}'], // or RegExp: /src\/.*\.[tj]sx?$/
       exclude: /node_modules/, // skip everything else
@@ -75,30 +68,8 @@ export default defineConfig({
   ssr: {
     // Force Vite to bundle CommonJS modules that don't work well with ESM
     noExternal: ['react-idle-timer'],
-    // Externalize Hono and related packages for SSR build
-    external: [
-      'hono',
-      'hono/cors',
-      'hono/proxy',
-      'hono/body-limit',
-      'hono/request-id',
-      'hono/context-storage',
-      'hono/vercel',
-    ],
   },
-  build: {
-    rollupOptions: {
-      external: [
-        'hono',
-        'hono/cors',
-        'hono/proxy',
-        'hono/body-limit',
-        'hono/request-id',
-        'hono/context-storage',
-        'hono/vercel',
-      ],
-    },
-  },
+  build: {},
   server: {
     allowedHosts: true,
     host: '0.0.0.0',
