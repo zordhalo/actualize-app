@@ -9,7 +9,7 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Mail, Calendar, TrendingUp, Award, LogOut } from "lucide-react-native";
-import { useAppTheme } from "@/utils/theme";
+import { useAppTheme, fonts } from "@/utils/theme";
 import useUser from "@/utils/useUser";
 import { useAuth } from "@/utils/auth/useAuth";
 
@@ -89,10 +89,12 @@ export default function ProfileScreen() {
       >
         <Text
           style={{
-            fontSize: 32,
-            fontFamily: "Montserrat_600SemiBold",
+            fontSize: 36,
+            fontFamily: fonts.display.bold,
             color: colors.primary,
             marginTop: 20,
+            textTransform: "uppercase",
+            letterSpacing: 1,
           }}
         >
           Profile
@@ -100,7 +102,7 @@ export default function ProfileScreen() {
         <Text
           style={{
             fontSize: 14,
-            fontFamily: "Montserrat_500Medium",
+            fontFamily: fonts.body.medium,
             color: colors.secondary,
             marginTop: 4,
           }}
@@ -140,7 +142,7 @@ export default function ProfileScreen() {
             <Text
               style={{
                 fontSize: 28,
-                fontFamily: "Montserrat_600SemiBold",
+                fontFamily: fonts.display.bold,
                 color: "#FFFFFF",
               }}
             >
@@ -150,10 +152,12 @@ export default function ProfileScreen() {
 
           <Text
             style={{
-              fontSize: 20,
-              fontFamily: "Montserrat_600SemiBold",
+              fontSize: 22,
+              fontFamily: fonts.display.semiBold,
               color: colors.primary,
               marginBottom: 8,
+              textTransform: "uppercase",
+              letterSpacing: 1,
             }}
           >
             {profile?.profile?.fullName || user?.name || "Wellness User"}
@@ -170,7 +174,7 @@ export default function ProfileScreen() {
             <Text
               style={{
                 fontSize: 14,
-                fontFamily: "Montserrat_400Regular",
+                fontFamily: fonts.body.regular,
                 color: colors.secondary,
                 marginLeft: 6,
               }}
@@ -185,7 +189,7 @@ export default function ProfileScreen() {
               <Text
                 style={{
                   fontSize: 13,
-                  fontFamily: "Montserrat_400Regular",
+                  fontFamily: fonts.body.regular,
                   color: colors.secondary,
                   marginLeft: 6,
                 }}
@@ -198,10 +202,12 @@ export default function ProfileScreen() {
 
         <Text
           style={{
-            fontSize: 16,
-            fontFamily: "Montserrat_600SemiBold",
+            fontSize: 18,
+            fontFamily: fonts.display.semiBold,
             color: colors.primary,
             marginBottom: 16,
+            textTransform: "uppercase",
+            letterSpacing: 1,
           }}
         >
           Wellness Stats
@@ -238,8 +244,8 @@ export default function ProfileScreen() {
               </View>
               <Text
                 style={{
-                  fontSize: 24,
-                  fontFamily: "Inconsolata_600SemiBold",
+                  fontSize: 28,
+                  fontFamily: fonts.display.bold,
                   color: colors.primary,
                 }}
               >
@@ -248,9 +254,10 @@ export default function ProfileScreen() {
               <Text
                 style={{
                   fontSize: 12,
-                  fontFamily: "Montserrat_500Medium",
+                  fontFamily: fonts.body.medium,
                   color: colors.secondary,
                   marginTop: 4,
+                  textTransform: "uppercase",
                 }}
               >
                 Assessments
@@ -273,8 +280,8 @@ export default function ProfileScreen() {
               </View>
               <Text
                 style={{
-                  fontSize: 24,
-                  fontFamily: "Inconsolata_600SemiBold",
+                  fontSize: 28,
+                  fontFamily: fonts.display.bold,
                   color: colors.primary,
                 }}
               >
@@ -283,9 +290,10 @@ export default function ProfileScreen() {
               <Text
                 style={{
                   fontSize: 12,
-                  fontFamily: "Montserrat_500Medium",
+                  fontFamily: fonts.body.medium,
                   color: colors.secondary,
                   marginTop: 4,
+                  textTransform: "uppercase",
                 }}
               >
                 Avg Score
@@ -304,7 +312,7 @@ export default function ProfileScreen() {
               <Text
                 style={{
                   fontSize: 13,
-                  fontFamily: "Montserrat_500Medium",
+                  fontFamily: fonts.body.medium,
                   color: colors.secondary,
                   marginBottom: 4,
                 }}
@@ -313,9 +321,11 @@ export default function ProfileScreen() {
               </Text>
               <Text
                 style={{
-                  fontSize: 18,
-                  fontFamily: "Montserrat_600SemiBold",
-                  color: colors.primary,
+                  fontSize: 20,
+                  fontFamily: fonts.display.semiBold,
+                  color: colors.lime,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
                 }}
               >
                 {profile.stats.bestDimension}
@@ -334,23 +344,23 @@ export default function ProfileScreen() {
             paddingHorizontal: 20,
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "center",
           }}
           onPress={handleSignOut}
         >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <LogOut size={20} color={colors.needsAttention} />
-            <Text
-              style={{
-                fontSize: 16,
-                fontFamily: "Montserrat_600SemiBold",
-                color: colors.needsAttention,
-                marginLeft: 12,
-              }}
-            >
-              Sign Out
-            </Text>
-          </View>
+          <LogOut size={20} color={colors.needsAttention} />
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: fonts.display.semiBold,
+              color: colors.needsAttention,
+              marginLeft: 12,
+              textTransform: "uppercase",
+              letterSpacing: 1,
+            }}
+          >
+            Sign Out
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>

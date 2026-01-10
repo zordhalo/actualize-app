@@ -18,8 +18,8 @@ export default function Page() {
 
   if (status === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
-        <div className="w-8 h-8 border-4 border-[#d90428] border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-brand-black">
+        <div className="w-8 h-8 border-4 border-brand-red border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }

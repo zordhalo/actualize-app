@@ -3,12 +3,6 @@ import { View, Text, ScrollView } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
-  useFonts,
-  Montserrat_400Regular,
-  Montserrat_500Medium,
-  Montserrat_600SemiBold,
-} from "@expo-google-fonts/montserrat";
-import {
   Sparkles,
   Activity,
   Brain,
@@ -16,21 +10,11 @@ import {
   Coins,
   Lightbulb,
 } from "lucide-react-native";
-import { useAppTheme } from "@/utils/theme";
+import { useAppTheme, fonts } from "@/utils/theme";
 
 export default function ResourcesScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
-
-  const [fontsLoaded] = useFonts({
-    Montserrat_400Regular,
-    Montserrat_500Medium,
-    Montserrat_600SemiBold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
 
   const resources = [
     {
@@ -108,10 +92,12 @@ export default function ResourcesScreen() {
       >
         <Text
           style={{
-            fontSize: 32,
-            fontFamily: "Montserrat_600SemiBold",
+            fontSize: 36,
+            fontFamily: fonts.display.bold,
             color: colors.primary,
             marginTop: 20,
+            textTransform: "uppercase",
+            letterSpacing: 1,
           }}
         >
           Resources
@@ -119,7 +105,7 @@ export default function ResourcesScreen() {
         <Text
           style={{
             fontSize: 14,
-            fontFamily: "Montserrat_500Medium",
+            fontFamily: fonts.body.medium,
             color: colors.secondary,
             marginTop: 4,
           }}
@@ -154,10 +140,12 @@ export default function ResourcesScreen() {
             <Lightbulb size={20} color={colors.actualize} />
             <Text
               style={{
-                fontSize: 16,
-                fontFamily: "Montserrat_600SemiBold",
+                fontSize: 18,
+                fontFamily: fonts.display.semiBold,
                 color: colors.primary,
                 marginLeft: 8,
+                textTransform: "uppercase",
+                letterSpacing: 1,
               }}
             >
               About Wellness
@@ -166,7 +154,7 @@ export default function ResourcesScreen() {
           <Text
             style={{
               fontSize: 14,
-              fontFamily: "Montserrat_400Regular",
+              fontFamily: fonts.body.regular,
               color: colors.secondary,
               lineHeight: 22,
             }}
@@ -211,8 +199,10 @@ export default function ResourcesScreen() {
                 <Text
                   style={{
                     fontSize: 18,
-                    fontFamily: "Montserrat_600SemiBold",
+                    fontFamily: fonts.display.semiBold,
                     color: colors.primary,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
                   }}
                 >
                   {resource.dimension}
@@ -241,7 +231,7 @@ export default function ResourcesScreen() {
                     <Text
                       style={{
                         fontSize: 14,
-                        fontFamily: "Montserrat_400Regular",
+                        fontFamily: fonts.body.regular,
                         color: colors.secondary,
                         lineHeight: 22,
                         flex: 1,
@@ -266,14 +256,25 @@ export default function ResourcesScreen() {
         >
           <Text
             style={{
-              fontSize: 13,
-              fontFamily: "Montserrat_500Medium",
-              color: colors.secondary,
+              fontSize: 14,
+              fontFamily: fonts.body.italic,
+              color: colors.lime,
               lineHeight: 20,
               textAlign: "center",
             }}
           >
-            Progress isn't perfection—it's awareness and deliberate change.
+            "Progress isn't perfection—it's awareness and deliberate change."
+          </Text>
+          <Text
+            style={{
+              fontSize: 12,
+              fontFamily: fonts.body.regular,
+              color: colors.secondary,
+              lineHeight: 18,
+              textAlign: "center",
+              marginTop: 8,
+            }}
+          >
             Start small, build consistently, and celebrate every step forward.
           </Text>
         </View>

@@ -3,7 +3,7 @@ import { View, Text, ScrollView, ActivityIndicator } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Calendar, TrendingUp } from "lucide-react-native";
-import { useAppTheme } from "@/utils/theme";
+import { useAppTheme, fonts } from "@/utils/theme";
 import useUser from "@/utils/useUser";
 
 export default function HistoryScreen() {
@@ -36,10 +36,10 @@ export default function HistoryScreen() {
   };
 
   const getScoreTier = (score) => {
-    if (score >= 80) return { label: "Thriving", color: colors.thriving };
-    if (score >= 60) return { label: "Good", color: colors.good };
-    if (score >= 40) return { label: "Fair", color: colors.fair };
-    return { label: "Needs Attention", color: colors.needsAttention };
+    if (score >= 80) return { label: "THRIVING", color: colors.thriving };
+    if (score >= 60) return { label: "GOOD", color: colors.good };
+    if (score >= 40) return { label: "FAIR", color: colors.fair };
+    return { label: "NEEDS ATTENTION", color: colors.needsAttention };
   };
 
   const formatDate = (dateString) => {
@@ -79,10 +79,12 @@ export default function HistoryScreen() {
       >
         <Text
           style={{
-            fontSize: 32,
-            fontFamily: "Montserrat_600SemiBold",
+            fontSize: 36,
+            fontFamily: fonts.display.bold,
             color: colors.primary,
             marginTop: 20,
+            textTransform: "uppercase",
+            letterSpacing: 1,
           }}
         >
           History
@@ -90,7 +92,7 @@ export default function HistoryScreen() {
         <Text
           style={{
             fontSize: 14,
-            fontFamily: "Montserrat_500Medium",
+            fontFamily: fonts.body.medium,
             color: colors.secondary,
             marginTop: 4,
           }}
@@ -123,11 +125,13 @@ export default function HistoryScreen() {
             />
             <Text
               style={{
-                fontSize: 18,
-                fontFamily: "Montserrat_600SemiBold",
+                fontSize: 20,
+                fontFamily: fonts.display.semiBold,
                 color: colors.primary,
                 marginBottom: 8,
                 textAlign: "center",
+                textTransform: "uppercase",
+                letterSpacing: 1,
               }}
             >
               No Assessments Yet
@@ -135,7 +139,7 @@ export default function HistoryScreen() {
             <Text
               style={{
                 fontSize: 14,
-                fontFamily: "Montserrat_400Regular",
+                fontFamily: fonts.body.regular,
                 color: colors.secondary,
                 textAlign: "center",
                 lineHeight: 22,
@@ -166,10 +170,12 @@ export default function HistoryScreen() {
                   <TrendingUp size={20} color={colors.actualize} />
                   <Text
                     style={{
-                      fontSize: 16,
-                      fontFamily: "Montserrat_600SemiBold",
+                      fontSize: 18,
+                      fontFamily: fonts.display.semiBold,
                       color: colors.primary,
                       marginLeft: 8,
+                      textTransform: "uppercase",
+                      letterSpacing: 1,
                     }}
                   >
                     Progress Overview
@@ -186,8 +192,8 @@ export default function HistoryScreen() {
                   <View style={{ alignItems: "center" }}>
                     <Text
                       style={{
-                        fontSize: 28,
-                        fontFamily: "Inconsolata_600SemiBold",
+                        fontSize: 32,
+                        fontFamily: fonts.display.bold,
                         color: colors.actualize,
                       }}
                     >
@@ -196,9 +202,10 @@ export default function HistoryScreen() {
                     <Text
                       style={{
                         fontSize: 12,
-                        fontFamily: "Montserrat_500Medium",
+                        fontFamily: fonts.body.medium,
                         color: colors.secondary,
                         marginTop: 4,
+                        textTransform: "uppercase",
                       }}
                     >
                       Total
@@ -208,8 +215,8 @@ export default function HistoryScreen() {
                   <View style={{ alignItems: "center" }}>
                     <Text
                       style={{
-                        fontSize: 28,
-                        fontFamily: "Inconsolata_600SemiBold",
+                        fontSize: 32,
+                        fontFamily: fonts.display.bold,
                         color: getScoreTier(
                           Math.round(
                             assessments.reduce(
@@ -230,9 +237,10 @@ export default function HistoryScreen() {
                     <Text
                       style={{
                         fontSize: 12,
-                        fontFamily: "Montserrat_500Medium",
+                        fontFamily: fonts.body.medium,
                         color: colors.secondary,
                         marginTop: 4,
+                        textTransform: "uppercase",
                       }}
                     >
                       Average
@@ -242,8 +250,8 @@ export default function HistoryScreen() {
                   <View style={{ alignItems: "center" }}>
                     <Text
                       style={{
-                        fontSize: 28,
-                        fontFamily: "Inconsolata_600SemiBold",
+                        fontSize: 32,
+                        fontFamily: fonts.display.bold,
                         color: getScoreTier(
                           Math.max(...assessments.map((a) => a.overallScore)),
                         ).color,
@@ -254,9 +262,10 @@ export default function HistoryScreen() {
                     <Text
                       style={{
                         fontSize: 12,
-                        fontFamily: "Montserrat_500Medium",
+                        fontFamily: fonts.body.medium,
                         color: colors.secondary,
                         marginTop: 4,
+                        textTransform: "uppercase",
                       }}
                     >
                       Best
@@ -268,10 +277,12 @@ export default function HistoryScreen() {
 
             <Text
               style={{
-                fontSize: 16,
-                fontFamily: "Montserrat_600SemiBold",
+                fontSize: 18,
+                fontFamily: fonts.display.semiBold,
                 color: colors.primary,
                 marginBottom: 16,
+                textTransform: "uppercase",
+                letterSpacing: 1,
               }}
             >
               All Assessments
@@ -301,7 +312,7 @@ export default function HistoryScreen() {
                       <Text
                         style={{
                           fontSize: 12,
-                          fontFamily: "Montserrat_500Medium",
+                          fontFamily: fonts.body.medium,
                           color: colors.secondary,
                           marginBottom: 4,
                         }}
@@ -316,8 +327,8 @@ export default function HistoryScreen() {
                       >
                         <Text
                           style={{
-                            fontSize: 40,
-                            fontFamily: "Inconsolata_600SemiBold",
+                            fontSize: 44,
+                            fontFamily: fonts.display.bold,
                             color: tier.color,
                           }}
                         >
@@ -327,8 +338,10 @@ export default function HistoryScreen() {
                           <Text
                             style={{
                               fontSize: 14,
-                              fontFamily: "Montserrat_600SemiBold",
+                              fontFamily: fonts.display.semiBold,
                               color: tier.color,
+                              textTransform: "uppercase",
+                              letterSpacing: 1,
                             }}
                           >
                             {tier.label}
@@ -337,8 +350,8 @@ export default function HistoryScreen() {
                             <Text
                               style={{
                                 fontSize: 11,
-                                fontFamily: "Montserrat_500Medium",
-                                color: colors.secondary,
+                                fontFamily: fonts.body.medium,
+                                color: colors.lime,
                                 marginTop: 2,
                               }}
                             >
@@ -363,7 +376,7 @@ export default function HistoryScreen() {
                         <Text
                           style={{
                             fontSize: 13,
-                            fontFamily: "Montserrat_500Medium",
+                            fontFamily: fonts.body.medium,
                             color: colors.secondary,
                             flex: 1,
                           }}
@@ -378,8 +391,8 @@ export default function HistoryScreen() {
                         >
                           <Text
                             style={{
-                              fontSize: 15,
-                              fontFamily: "Inconsolata_600SemiBold",
+                              fontSize: 16,
+                              fontFamily: fonts.display.semiBold,
                               color: getScoreTier(score).color,
                               width: 32,
                               textAlign: "right",

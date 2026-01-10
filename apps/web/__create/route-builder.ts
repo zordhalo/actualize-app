@@ -1,4 +1,4 @@
-import { readdir, stat } from 'node:fs/promises';
+import { readdir, stat, access } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Hono } from 'hono';
@@ -11,6 +11,17 @@ const api = new Hono();
 // Get current directory
 const __dirname = join(fileURLToPath(new URL('.', import.meta.url)), '../src/app/api');
 
+// Check if directory exists
+async function directoryExists(dir: string): Promise<boolean> {
+  try {
+    await access(dir);
+    const stats = await stat(dir);
+    return stats.isDirectory();
+  } catch {
+    return false;
+  }
+}
+
 // Helper to convert path to import specifier (handles Windows paths)
 function toImportSpecifier(filePath: string): string {
   return pathToFileURL(filePath).href;
@@ -21,6 +32,11 @@ if (globalThis.fetch) {
 
 // Recursively find all route.js files
 async function findRouteFiles(dir: string): Promise<string[]> {
+  // Check if directory exists before trying to read it
+  if (!(await directoryExists(dir))) {
+    return [];
+  }
+  
   const files = await readdir(dir);
   let routes: string[] = [];
 

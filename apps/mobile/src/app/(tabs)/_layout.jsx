@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { View } from "react-native";
 import { Home, History, User, BookOpen } from "lucide-react-native";
-import { useAppTheme } from "@/utils/theme";
+import { useAppTheme, fonts } from "@/utils/theme";
 
 export default function TabLayout() {
   const { colors, isDark } = useAppTheme();
@@ -22,7 +22,7 @@ export default function TabLayout() {
         tabBarShowLabel: true,
         tabBarLabelStyle: {
           fontSize: 10,
-          fontWeight: "500",
+          fontFamily: fonts.body.medium,
           marginTop: 4,
         },
       }}

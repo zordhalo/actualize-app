@@ -1,20 +1,37 @@
-import fg from 'fast-glob';
 import type { Route } from './+types/not-found';
 import { useNavigate } from 'react-router';
 import { useCallback, useEffect, useState } from 'react';
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const matches = await fg('src/**/page.{js,jsx,ts,tsx}');
+  // During prerendering/build, fast-glob won't work properly
+  // Return minimal valid data structure
+  let pages: Array<{ url: string; path: string }> = [];
+  
+  // Only scan filesystem in development or at runtime (not during prerender)
+  if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+    try {
+      const fg = await import('fast-glob');
+      const matches = await fg.default('src/**/page.{js,jsx,ts,tsx}');
+      pages = matches
+        .sort((a, b) => a.length - b.length)
+        .map((match) => {
+          const url = match.replace('src/app', '').replace(/\/page\.(js|jsx|ts|tsx)$/, '') || '/';
+          const path = url.replaceAll('[', '').replaceAll(']', '');
+          const displayPath = path === '/' ? 'Homepage' : path;
+          return { url, path: displayPath };
+        });
+    } catch {
+      // Fallback if glob fails
+      pages = [{ url: '/', path: 'Homepage' }];
+    }
+  } else {
+    // In production, provide a minimal fallback
+    pages = [{ url: '/', path: 'Homepage' }];
+  }
+  
   return {
-    path: `/${params['*']}`,
-    pages: matches
-      .sort((a, b) => a.length - b.length)
-      .map((match) => {
-        const url = match.replace('src/app', '').replace(/\/page\.(js|jsx|ts|tsx)$/, '') || '/';
-        const path = url.replaceAll('[', '').replaceAll(']', '');
-        const displayPath = path === '/' ? 'Homepage' : path;
-        return { url, path: displayPath };
-      }),
+    path: `/${params['*'] ?? ''}`,
+    pages,
   };
 }
 
