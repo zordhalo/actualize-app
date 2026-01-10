@@ -1,6 +1,31 @@
-import { Link } from "react-router";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "@clerk/clerk-react";
 
 export default function WelcomePage() {
+  const { isLoaded, isSignedIn } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      navigate("/dashboard");
+    }
+  }, [isLoaded, isSignedIn, navigate]);
+
+  // Show loading while checking auth
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-brand-black">
+        <div className="w-8 h-8 border-4 border-brand-red border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // If signed in, don't render anything (will redirect)
+  if (isSignedIn) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-starry text-brand-white">
       <div className="max-w-xl mx-auto px-5 py-16">

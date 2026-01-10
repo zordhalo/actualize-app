@@ -38,6 +38,13 @@ export function ClerkAuthProvider({ children }: { children: React.ReactNode }) {
       signInUrl={CLERK_SIGN_IN_PATH}
       signUpUrl={CLERK_SIGN_UP_PATH}
       afterSignOutUrl="/"
+      appearance={{
+        elements: {
+          socialButtonsProviderIcon__apple: {
+            filter: 'invert(1)',
+          },
+        },
+      }}
       localization={{
         signIn: {
           start: {
