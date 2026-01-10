@@ -16,16 +16,23 @@ import MongoDBAdapter from './mongodb-adapter';
 import clientPromise, { getDatabaseName } from '../src/app/api/utils/mongodb';
 import { getHTMLForErrorPage } from './get-html-for-error-page';
 import { isAuthAction } from './is-auth-action';
-import { API_BASENAME, api } from './route-builder';
+import { API_BASENAME, api, initializeRoutes } from './route-builder';
 
-// Better Auth integration
+// Better Auth integration - lazily initialized
 let betterAuthInstance: any = null;
-try {
-  // Dynamic import to avoid errors if better-auth is not installed
-  const { auth } = await import('../src/lib/auth');
-  betterAuthInstance = auth;
-} catch (error) {
-  console.warn('[auth] Better Auth not available, falling back to Auth.js:', error);
+let betterAuthInitialized = false;
+
+async function initBetterAuth() {
+  if (betterAuthInitialized) return betterAuthInstance;
+  betterAuthInitialized = true;
+  try {
+    // Dynamic import to avoid errors if better-auth is not installed
+    const { auth } = await import('../src/lib/auth');
+    betterAuthInstance = auth;
+  } catch (error) {
+    console.warn('[auth] Better Auth not available, falling back to Auth.js:', error);
+  }
+  return betterAuthInstance;
 }
 
 const als = new AsyncLocalStorage<{ requestId: string }>();
@@ -400,7 +407,15 @@ app.use('/api/auth/*', async (c, next) => {
 });
 app.route(API_BASENAME, api);
 
-export default await createHonoServer({
-  app,
-  defaultLogger: false,
-});
+async function bootstrap() {
+  // Initialize Better Auth and routes before starting server
+  await initBetterAuth();
+  await initializeRoutes();
+  
+  return createHonoServer({
+    app,
+    defaultLogger: false,
+  });
+}
+
+export default bootstrap();

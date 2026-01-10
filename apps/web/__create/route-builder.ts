@@ -154,21 +154,29 @@ async function registerRoutes() {
   }
 }
 
-// Initial route registration
-await registerRoutes();
+// Track initialization state
+let routesInitialized = false;
 
-// Hot reload routes in development
-if (import.meta.env.DEV) {
-  import.meta.glob('../src/app/api/**/route.js', {
-    eager: true,
-  });
-  if (import.meta.hot) {
-    import.meta.hot.accept((newSelf) => {
-      registerRoutes().catch((err) => {
-        console.error('Error reloading routes:', err);
-      });
+// Export initialization function to be called from bootstrap
+async function initializeRoutes() {
+  if (routesInitialized) return;
+  routesInitialized = true;
+  
+  await registerRoutes();
+  
+  // Hot reload routes in development
+  if (import.meta.env.DEV) {
+    import.meta.glob('../src/app/api/**/route.js', {
+      eager: true,
     });
+    if (import.meta.hot) {
+      import.meta.hot.accept((newSelf) => {
+        registerRoutes().catch((err) => {
+          console.error('Error reloading routes:', err);
+        });
+      });
+    }
   }
 }
 
-export { api, API_BASENAME };
+export { api, API_BASENAME, initializeRoutes };
