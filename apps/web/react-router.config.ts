@@ -1,3 +1,4 @@
+import { vercelPreset } from '@vercel/react-router/vite';
 import type { Config } from '@react-router/dev/config';
 
 /**
@@ -27,6 +28,6 @@ export default {
 	// Server build output file
 	serverBuildFile: 'index.js',
 	
-	// No presets - Vercel handles deployment via its own function wrappers
-	// The react-router-hono-server plugin is still used for local development
+	// Vercel preset for proper deployment with absolute paths
+	presets: [vercelPreset()],
 } satisfies Config;
