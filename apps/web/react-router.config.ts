@@ -24,9 +24,6 @@ export default {
 	// Build output directory
 	buildDirectory: 'build',
 	
-	// Public assets path
-	publicPath: '/',
-	
 	// Server build output file
 	serverBuildFile: 'index.js',
 	

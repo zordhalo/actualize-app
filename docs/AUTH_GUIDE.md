@@ -4,7 +4,7 @@ This document provides a comprehensive guide for the authentication system in th
 
 ## Overview
 
-The app uses a **dual authentication system** that supports both **Better Auth** (primary) and **Auth.js** (fallback). The system automatically detects which is configured and uses the appropriate provider.
+The app uses **Better Auth** for authentication, with a specialized architecture for Vercel serverless deployment. The system supports both local development (via Hono server) and production deployment (via Vercel Functions).
 
 ### Features
 
@@ -14,66 +14,76 @@ The app uses a **dual authentication system** that supports both **Better Auth**
 - Organization/team management via Better Auth
 - Session management with secure HTTP-only cookies
 - Protected routes with automatic redirects
-- Automatic fallback between auth systems
+- Serverless-optimized MongoDB connections
 
 ## Architecture
 
+### Vercel Serverless Deployment
+
+In production, Better Auth runs as a dedicated Vercel Function, separate from React Router:
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                        Vercel Edge                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   /api/auth/*  ──────►  Vercel Function                         │
+│                         (api/auth/[...auth].ts)                  │
+│                         └── Better Auth Handler                  │
+│                         └── hono/vercel adapter                  │
+│                                                                  │
+│   All other    ──────►  React Router SSR                         │
+│   routes                (via react-router-hono-server)           │
+│                                                                  │
+└──────────────────────────────┬──────────────────────────────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   MongoDB Atlas     │
+                    │   (connection-pooled│
+                    │    for serverless)  │
+                    └─────────────────────┘
 ```
-┌─────────────────────────────────────────────────────────┐
-│                   Client (React)                        │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐  │
-│  │ AuthProvider│  │  useAuth()  │  │ ProtectedRoute  │  │
-│  └──────┬──────┘  └──────┬──────┘  └────────┬────────┘  │
-│         │                │                   │          │
-│         └────────────────┼───────────────────┘          │
-│                          │                              │
-│         ┌────────────────▼────────────────┐             │
-│         │         useAuth Hook            │             │
-│         │   (apps/web/src/utils/useAuth)  │             │
-│         └────────────────┬────────────────┘             │
-│                          │                              │
-│    ┌─────────────────────┼─────────────────────┐        │
-│    │                     │                     │        │
-│    ▼                     ▼                     ▼        │
-│  Better Auth          Auth.js             Fallback      │
-│  authClient           signIn()            Detection     │
-└────┬─────────────────────┬─────────────────────────────┘
-     │                     │
-     └──────────┬──────────┘
-                │
-                ▼
-┌───────────────────────────────────────────────────────┐
-│                   Hono Server                          │
-│              (apps/web/__create/index.ts)              │
-│                                                        │
-│  ┌─────────────────┐    ┌─────────────────────────┐   │
-│  │  Better Auth    │ OR │  Auth.js (Credentials)  │   │
-│  │    Handler      │    │       Providers         │   │
-│  └────────┬────────┘    └───────────┬─────────────┘   │
-│           │                         │                  │
-│           └────────────┬────────────┘                  │
-│                        │                               │
-│                        ▼                               │
-│              MongoDB Adapter                           │
-└────────────────────────┬──────────────────────────────┘
-                         │
-                         ▼
-               ┌─────────────────┐
-               │     MongoDB     │
-               │ (users, accts,  │
-               │  sessions)      │
-               └─────────────────┘
+
+### Local Development
+
+In development, all routes go through the Hono server:
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                   Hono Server (react-router-hono-server)         │
+│                      (apps/web/__create/index.ts)                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   /api/auth/*  ──────►  Better Auth Handler (inline)             │
+│   All other    ──────►  React Router                             │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
 ```
+
+### Why Separate Functions for Vercel?
+
+React Router's `react-router-hono-server` assumes a long-running Node.js server. In Vercel's serverless architecture, this causes Better Auth routes at `/api/auth/*` to fail with:
+
+```text
+Error: You made a POST request to "/api/auth/sign-in/email" but did not provide 
+an `action` for route "__create/not-found"
+```
+
+**Root cause**: React Router's serverless handler intercepts all requests before they reach the Hono Better Auth routes, and the catch-all route has no action handler for POST requests.
+
+**Solution**: Dedicated Vercel Function for Better Auth that runs independently.
 
 ## Request Flow
 
 1. **Client Request**: User submits credentials via signin/signup form
-2. **useAuth Hook**: Detects if Better Auth is available, otherwise uses Auth.js
+2. **useAuth Hook**: Calls Better Auth client methods
 3. **API Call**: Makes request to `/api/auth/*` endpoints
-4. **Hono Server**: Routes request to Better Auth or Auth.js handler
-5. **Database**: MongoDB adapter creates/validates user records
-6. **Session**: Secure HTTP-only cookies store session data
-7. **Response**: User data returned to client, AuthProvider refreshes
+4. **Vercel Function**: (Production) Dedicated function handles auth
+5. **Hono Server**: (Development) Inline handler processes auth
+6. **Database**: MongoDB adapter creates/validates user records
+7. **Session**: Secure HTTP-only cookies store session data
+8. **Response**: User data returned to client, AuthProvider refreshes
 
 ## Configuration
 
@@ -84,14 +94,15 @@ Add to `apps/web/.env` (see `env.template` for reference):
 ```env
 # Database Configuration
 MONGODB_URI=mongodb://localhost:27017/actualize
+MONGODB_DATABASE=actualize  # Optional - extracted from URI if not set
 
-# Auth.js Configuration (required)
-AUTH_SECRET=your-auth-secret-key-here
-AUTH_URL=http://localhost:3000
-
-# Better Auth Configuration (optional - enables Better Auth features)
+# Better Auth Configuration (required)
 BETTER_AUTH_SECRET=your-better-auth-secret-key-here
 BETTER_AUTH_URL=http://localhost:3000
+
+# Alternative auth secret (for backwards compatibility)
+AUTH_SECRET=your-auth-secret-key-here
+AUTH_URL=http://localhost:3000
 
 # OAuth Providers (optional)
 GITHUB_CLIENT_ID=your-github-client-id
@@ -107,15 +118,17 @@ CORS_ORIGINS=http://localhost:3000,http://localhost:3001
 
 Add these environment variables in Vercel Dashboard → Settings → Environment Variables:
 
-| Variable | Description |
-|----------|-------------|
-| `AUTH_SECRET` | Random secret for JWT signing |
-| `AUTH_URL` | Your production URL (e.g., `https://your-app.vercel.app`) |
-| `BETTER_AUTH_SECRET` | Same or different secret for Better Auth |
-| `BETTER_AUTH_URL` | Your production URL |
-| `MONGODB_URI` | MongoDB Atlas connection string |
-| `GITHUB_CLIENT_ID` | GitHub OAuth App Client ID |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth App Client Secret |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `BETTER_AUTH_SECRET` | ✅ | Random secret for signing tokens (min 32 chars) |
+| `BETTER_AUTH_URL` | ✅ | Your production URL (e.g., `https://your-app.vercel.app`) |
+| `MONGODB_URI` | ✅ | MongoDB Atlas connection string |
+| `MONGODB_DATABASE` | ❌ | Database name (extracted from URI if not set) |
+| `GITHUB_CLIENT_ID` | ❌ | GitHub OAuth App Client ID |
+| `GITHUB_CLIENT_SECRET` | ❌ | GitHub OAuth App Client Secret |
+| `VERCEL_URL` | Auto | Automatically set by Vercel for preview deployments |
+
+> **Note**: Vercel automatically sets `VERCEL_URL` for preview deployments. Better Auth uses this for dynamic base URL when `BETTER_AUTH_URL` is not set.
 
 ### Setting Up GitHub OAuth
 
@@ -133,26 +146,120 @@ Add these environment variables in Vercel Dashboard → Settings → Environment
 
 ```
 apps/web/
+├── api/
+│   └── auth/
+│       └── [...auth].ts      # Vercel Function for Better Auth (production)
 ├── __create/
-│   ├── index.ts              # Hono server with auth handlers
-│   ├── mongodb-adapter.ts    # MongoDB adapter for Auth.js
+│   ├── index.ts              # Hono server with auth handlers (development)
+│   ├── mongodb-adapter.ts    # MongoDB adapter for Auth.js (legacy)
 │   └── is-auth-action.ts     # Auth action detection
 ├── src/
-│   ├── auth.js               # Auth.js configuration (legacy)
 │   ├── auth/
 │   │   └── AuthProvider.tsx  # React context for Better Auth
 │   ├── lib/
-│   │   ├── auth.ts           # Better Auth server instance
+│   │   ├── auth.ts           # Better Auth server instance (serverless-optimized)
 │   │   └── auth-client.ts    # Better Auth client instance
 │   ├── utils/
-│   │   └── useAuth.js        # Unified auth hook (Better Auth + Auth.js)
+│   │   └── useAuth.js        # Unified auth hook
 │   ├── components/
 │   │   └── ProtectedRoute.jsx # Route protection component
 │   └── app/account/
 │       ├── signin/page.jsx   # Sign in page
 │       ├── signup/page.jsx   # Sign up page
 │       └── logout/page.jsx   # Logout page
+├── vercel.json               # Vercel routing configuration (in repo root)
+└── react-router.config.ts    # React Router configuration
 ```
+
+### Key Files Explained
+
+| File | Purpose |
+|------|---------|
+| `api/auth/[...auth].ts` | Vercel Function that handles all `/api/auth/*` requests in production |
+| `src/lib/auth.ts` | Better Auth server configuration with serverless-optimized MongoDB |
+| `src/lib/auth-client.ts` | Better Auth React client with organization & 2FA plugins |
+| `src/auth/AuthProvider.tsx` | React context that manages auth state globally |
+| `src/utils/useAuth.js` | Hook providing `signIn`, `signUp`, `signOut` methods |
+| `vercel.json` | Routes `/api/auth/*` to dedicated Vercel Function |
+
+## Vercel Serverless Configuration
+
+### Vercel Function: `api/auth/[...auth].ts`
+
+This file creates a dedicated serverless function for Better Auth:
+
+```ts
+// apps/web/api/auth/[...auth].ts
+import { handle } from "hono/vercel";
+import { auth } from "../../src/lib/auth";
+
+// Wrap Better Auth handler with Hono's Vercel adapter
+export default handle(auth.handler);
+
+// Vercel Function configuration
+export const config = {
+  maxDuration: 10,  // 10 second timeout
+  memory: 256,      // 256MB RAM
+};
+```
+
+### Vercel Routing: `vercel.json`
+
+The `vercel.json` in the repo root configures routing:
+
+```json
+{
+  "rewrites": [
+    {
+      "source": "/api/auth/:path*",
+      "destination": "/api/auth/[...auth]"
+    }
+  ],
+  "functions": {
+    "api/auth/[...auth].ts": {
+      "maxDuration": 10,
+      "memory": 256
+    }
+  }
+}
+```
+
+### Serverless MongoDB Optimization
+
+The `src/lib/auth.ts` file uses serverless-optimized MongoDB connections:
+
+```ts
+// Connection caching for serverless
+let cachedClient: MongoClient | null = null;
+
+async function getMongoClient(): Promise<MongoClient> {
+  if (cachedClient) {
+    try {
+      await cachedClient.db().admin().ping();
+      return cachedClient;
+    } catch {
+      cachedClient = null;
+    }
+  }
+
+  const client = new MongoClient(uri, {
+    maxPoolSize: 1,      // Minimize connections in serverless
+    minPoolSize: 0,
+    serverSelectionTimeoutMS: 10000,
+  });
+
+  await client.connect();
+  cachedClient = client;
+  return client;
+}
+```
+
+**Key optimizations**:
+
+- Connection caching across function invocations
+- Minimal pool size (1 connection) for serverless
+- Connection health check before reuse
+- Short session cache (5 minutes) to avoid stale data
 
 ## Usage
 
@@ -283,30 +390,44 @@ await signOut({
 });
 ```
 
-## How the Dual Auth System Works
+## How Better Auth Works
 
-The `useAuth` hook (`apps/web/src/utils/useAuth.js`) automatically detects which auth system is available:
+The `useAuth` hook (`apps/web/src/utils/useAuth.js`) provides a clean interface to Better Auth:
 
 ```javascript
-// Simplified detection logic
-try {
-  const betterAuth = useBetterAuthContext();
-  useBetterAuthSystem = !!betterAuth;
-} catch {
-  // Better Auth not available, use Auth.js fallback
-  useBetterAuthSystem = false;
-}
+import { authClient } from "@/lib/auth-client";
+
+const signInWithCredentials = async (options) => {
+  const { data, error } = await authClient.signIn.email({
+    email: options.email,
+    password: options.password,
+  });
+  
+  if (error) {
+    return { error: error.message };
+  }
+  
+  return { ok: true, data };
+};
 ```
 
-### When Better Auth is Used:
-- `BETTER_AUTH_SECRET` is set
-- Better Auth package is installed
-- Calls `authClient.signIn.email()`, `authClient.signUp.email()`, etc.
+### Available Methods
 
-### When Auth.js is Used:
-- Better Auth is not configured
-- Falls back to credential providers defined in Hono server
-- Calls `signIn("credentials-signin")`, `signIn("credentials-signup")`
+| Method | Description |
+|--------|-------------|
+| `signInWithCredentials({ email, password })` | Email/password sign in |
+| `signUpWithCredentials({ email, password, name })` | Create new account |
+| `signInWithGitHub()` | OAuth sign in with GitHub |
+| `signInWithGoogle()` | OAuth sign in with Google |
+| `signOut()` | Sign out current user |
+
+### Session Management
+
+Better Auth uses HTTP-only cookies for secure session storage. The `AuthProvider` automatically:
+
+1. Fetches session on mount
+2. Refreshes session every 5 minutes
+3. Provides user state to all child components
 
 ## Development Testing
 
@@ -363,6 +484,34 @@ The 2FA plugin is enabled. Implement UI flows for:
 See [Better Auth 2FA docs](https://www.better-auth.com/docs/plugins/two-factor) for API details.
 
 ## Troubleshooting
+
+### Vercel Deployment Issues
+
+#### "No action for route" Error
+
+```
+Error: You made a POST request to "/api/auth/sign-in/email" but did not provide 
+an `action` for route "__create/not-found"
+```
+
+**Cause**: React Router is intercepting auth requests before they reach Better Auth.
+
+**Solution**: Ensure the Vercel Function exists at `apps/web/api/auth/[...auth].ts` and `vercel.json` has the correct rewrite rules.
+
+#### Cold Start Timeouts
+
+Auth requests timing out on first request after deployment.
+
+**Solution**: 
+1. Increase `maxDuration` in function config (up to 60s on Pro plan)
+2. Ensure MongoDB connection string uses connection pooling
+3. Consider using Vercel's Edge Functions for faster cold starts
+
+#### Session Not Persisting Across Deployments
+
+**Cause**: Different secrets between deployments or missing env vars.
+
+**Solution**: Ensure `BETTER_AUTH_SECRET` is set consistently across all environments in Vercel Dashboard.
 
 ### Session Not Persisting
 
