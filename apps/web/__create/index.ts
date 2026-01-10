@@ -344,24 +344,34 @@ app.all('/integrations/:path{.+}', async (c, next) => {
 });
 
 // Better Auth handler - mounted at /api/auth/* for both GET and POST
-// This takes precedence over Auth.js when Better Auth is enabled
-if (betterAuthInstance && (process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET)) {
-  app.on(['GET', 'POST'], '/api/auth/*', async (c) => {
-    try {
-      const response = await betterAuthInstance.handler(c.req.raw);
-      return response;
-    } catch (error) {
-      console.error('[auth] Better Auth handler error:', error);
-      return c.json(
-        {
-          error: 'Authentication error',
-          message: error instanceof Error ? error.message : 'Unknown auth error',
-        },
-        500
-      );
-    }
-  });
-}
+// Always register the route handler - check conditions at runtime
+// This ensures the route is registered even if env vars aren't available at build time
+app.on(['GET', 'POST'], '/api/auth/*', async (c) => {
+  // Check if Better Auth is available and configured at runtime
+  if (!betterAuthInstance) {
+    console.warn('[auth] Better Auth instance not available');
+    return c.json({ error: 'Auth not configured' }, 503);
+  }
+  
+  if (!process.env.BETTER_AUTH_SECRET && !process.env.AUTH_SECRET) {
+    console.warn('[auth] No auth secret configured');
+    return c.json({ error: 'Auth secret not configured' }, 503);
+  }
+
+  try {
+    const response = await betterAuthInstance.handler(c.req.raw);
+    return response;
+  } catch (error) {
+    console.error('[auth] Better Auth handler error:', error);
+    return c.json(
+      {
+        error: 'Authentication error',
+        message: error instanceof Error ? error.message : 'Unknown auth error',
+      },
+      500
+    );
+  }
+});
 
 // Legacy Auth.js handler - fallback if Better Auth is not enabled
 app.use('/api/auth/*', async (c, next) => {
