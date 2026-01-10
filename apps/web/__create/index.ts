@@ -83,8 +83,8 @@ for (const method of ['post', 'put', 'patch'] as const) {
 if (process.env.AUTH_SECRET) {
   app.use(
     '*',
-    initAuthConfig((c) => ({
-      secret: c.env.AUTH_SECRET,
+    initAuthConfig(() => ({
+      secret: process.env.AUTH_SECRET,
       basePath: '/api/auth',
       pages: {
         signIn: '/account/signin',

@@ -485,7 +485,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
 export default function App() {
   return (
-    <SessionProvider>
+    <SessionProvider basePath="/api/auth">
       <Outlet />
     </SessionProvider>
   );
