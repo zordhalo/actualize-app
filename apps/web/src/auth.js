@@ -7,7 +7,7 @@ import CreateAuth from "@auth/create"
 import Credentials from "@auth/core/providers/credentials"
 import MongoDBAdapter from "../__create/mongodb-adapter"
 import clientPromise, { getDatabaseName } from "./app/api/utils/mongodb"
-import { hash, verify } from 'argon2'
+import bcrypt from 'bcryptjs'
 
 // Use database name from connection string or environment variable
 const adapter = MongoDBAdapter(clientPromise, { databaseName: getDatabaseName() });
@@ -48,7 +48,7 @@ export const { auth } = CreateAuth({
       return null;
     }
 
-    const isValid = await verify(accountPassword, password);
+    const isValid = await bcrypt.compare(password, accountPassword);
     if (!isValid) {
       return null;
     }
@@ -100,7 +100,7 @@ export const { auth } = CreateAuth({
       });
       await adapter.linkAccount({
         extraData: {
-          password: await hash(password),
+          password: await bcrypt.hash(password, 10),
         },
         type: 'credentials',
         userId: newUser.id,

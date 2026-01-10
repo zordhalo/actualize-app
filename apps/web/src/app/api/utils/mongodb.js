@@ -67,8 +67,8 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 export async function getDb(dbName = databaseName) {
-  const client = await clientPromise;
-  return client.db(dbName);
+  const mongoClient = await clientPromise;
+  return mongoClient.db(dbName);
 }
 
 export function getDatabaseName() {

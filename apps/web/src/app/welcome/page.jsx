@@ -1,5 +1,4 @@
 import { Link } from "react-router";
-import actualizeArrowsIcon from "../../../../../brand/actualizeIconArrowsNBG.png";
 
 export default function WelcomePage() {
   return (
@@ -34,8 +33,8 @@ export default function WelcomePage() {
           </div>
 
           <div className="card-brand">
-            <div className="w-12 h-12 rounded-full bg-[#22c55e] flex items-center justify-center mb-3">
-              <img src={actualizeArrowsIcon} alt="Track Progress" className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-full bg-[#22c55e] flex items-center justify-center mb-3 text-2xl">
+              📈
             </div>
             <h3 className="text-lg font-display font-semibold text-brand-white mb-2 uppercase tracking-wide">
               Track Your Progress
@@ -53,8 +52,7 @@ export default function WelcomePage() {
               Actionable Recommendations
             </h3>
             <p className="text-sm text-[#999] leading-6 font-body">
-              Get personalized tips to improve{" "}
-              <span className="text-brand-lime font-semibold">(IN ALL AREAS OF LIFE)</span>
+              Get personalized tips to improve <span className="text-brand-lime font-semibold">(IN ALL AREAS OF LIFE)</span>
             </p>
           </div>
         </div>

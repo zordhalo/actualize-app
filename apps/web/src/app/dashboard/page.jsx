@@ -189,17 +189,23 @@ function DashboardContent() {
 
         {/* Bottom Navigation */}
         <div className="fixed bottom-0 left-0 right-0 bg-surface border-t border-surface-light px-4 py-3">
-          <div className="max-w-2xl mx-auto flex justify-around">
+          <div className="max-w-2xl mx-auto flex justify-around items-end">
             <Link to="/dashboard" className="flex flex-col items-center gap-1 text-brand-red">
-              <img src={actualizeIcon} alt="Home" className="w-9 h-9" />
+              <div className="h-10 flex items-center justify-center">
+                <img src={actualizeIcon} alt="Home" className="w-8 h-8" />
+              </div>
               <span className="text-xs font-body">Home</span>
             </Link>
             <Link to="/history" className="flex flex-col items-center gap-1 text-[#999] hover:text-brand-white">
-              <img src={actualizeArrowsIcon} alt="History" className="w-12 h-12" />
+              <div className="h-10 flex items-center justify-center">
+                <img src={actualizeArrowsIcon} alt="History" className="w-8 h-8" />
+              </div>
               <span className="text-xs font-body">History</span>
             </Link>
             <Link to="/profile" className="flex flex-col items-center gap-1 text-[#999] hover:text-brand-white">
-              <img src={actualizeBoltIcon} alt="Profile" className="w-12 h-12" />
+              <div className="h-10 flex items-center justify-center">
+                <img src={actualizeBoltIcon} alt="Profile" className="w-8 h-8" />
+              </div>
               <span className="text-xs font-body">Profile</span>
             </Link>
           </div>
