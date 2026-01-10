@@ -1,11 +1,7 @@
 import { readdirSync, statSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-	type RouteConfigEntry,
-	index,
-	route,
-} from '@react-router/dev/routes';
+import type { RouteConfigEntry } from '@react-router/dev/routes';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -104,11 +100,13 @@ function generateRoutes(node: Tree): RouteConfigEntry[] {
 	const routes: RouteConfigEntry[] = [];
 
 	if (node.hasPage) {
+		// Fix: use './page.jsx' for root, not './${empty}page.jsx'
 		const componentPath =
-			node.path === '' ? `./${node.path}page.jsx` : `./${node.path}/page.jsx`;
+			node.path === '' ? './page.jsx' : `./${node.path}/page.jsx`;
 
 		if (node.path === '') {
-			routes.push(index(componentPath));
+			// Create index route as plain object instead of using index() helper
+			routes.push({ index: true, file: componentPath } as RouteConfigEntry);
 		} else {
 			// Handle parameter routes
 			let routePath = node.path;
@@ -134,7 +132,8 @@ function generateRoutes(node: Tree): RouteConfigEntry[] {
 			});
 
 			routePath = processedSegments.join('/');
-			routes.push(route(routePath, componentPath));
+			// Create route as plain object instead of using route() helper
+			routes.push({ path: routePath, file: componentPath } as RouteConfigEntry);
 		}
 	}
 
@@ -156,7 +155,9 @@ if (import.meta.env.DEV) {
 // Build route tree with a fresh visited set for each build
 const tree = buildRouteTree(__dirname, '', new Set<string>());
 const generatedRoutes = generateRoutes(tree);
-const notFound = route('*', './__create/not-found.tsx');
+
+// Create catch-all route as plain object instead of using route() helper
+const notFound: RouteConfigEntry = { path: '*', file: './__create/not-found.tsx' } as RouteConfigEntry;
 
 // Combine routes - generated routes first, then catch-all
 const routes: RouteConfigEntry[] = [...generatedRoutes, notFound];
