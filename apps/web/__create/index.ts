@@ -344,8 +344,10 @@ app.all('/integrations/:path{.+}', async (c, next) => {
 });
 
 // Better Auth handler - mounted at /api/auth/* for both GET and POST
-// Always register the route handler - check conditions at runtime
-// This ensures the route is registered even if env vars aren't available at build time
+// NOTE: In Vercel serverless deployment, auth requests are handled by the
+// dedicated Vercel Function at api/auth/[...auth].ts. This handler is only
+// active in local development when using react-router-hono-server.
+// The Vercel Function takes precedence due to Vercel's routing configuration.
 app.on(['GET', 'POST'], '/api/auth/*', async (c) => {
   // Check if Better Auth is available and configured at runtime
   if (!betterAuthInstance) {

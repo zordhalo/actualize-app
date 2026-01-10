@@ -1,5 +1,30 @@
 // apps/web/src/lib/auth-client.ts
 import { createAuthClient } from "better-auth/react";
+import { organizationClient } from "better-auth/client/plugins";
+import { twoFactorClient } from "better-auth/client/plugins";
+
+/**
+ * Better Auth client for React components.
+ *
+ * This client:
+ * - Communicates with /api/auth/* endpoints (served by Vercel Function)
+ * - Handles cookie-based sessions automatically
+ * - Provides React hooks for auth state
+ *
+ * @example
+ * import { authClient } from '@/lib/auth-client';
+ *
+ * function LoginButton() {
+ *   const handleSignIn = async () => {
+ *     await authClient.signIn.email({
+ *       email: 'user@example.com',
+ *       password: 'password123'
+ *     });
+ *   };
+ *
+ *   return <button onClick={handleSignIn}>Sign In</button>;
+ * }
+ */
 
 /**
  * Get the base URL for Better Auth.
@@ -22,18 +47,20 @@ const getBaseURL = () => {
     }
     return "http://localhost:3000";
   }
-  
-  // Client-side: use public env var or relative URL
-  // @ts-ignore - NEXT_PUBLIC_ vars are available via Vite's envPrefix
-  if (import.meta.env?.NEXT_PUBLIC_AUTH_URL) {
-    // @ts-ignore
-    return import.meta.env.NEXT_PUBLIC_AUTH_URL;
+
+  // Client-side: Check for localhost development
+  if (window.location.hostname === "localhost") {
+    return "http://localhost:3000";
   }
-  
-  // Fallback to same-origin relative URL (works in browser)
+
+  // Production/preview: use same-origin (empty string = relative URL)
   return "";
 };
 
 export const authClient = createAuthClient({
   baseURL: getBaseURL(),
+  plugins: [
+    organizationClient(),
+    twoFactorClient(),
+  ],
 });

@@ -1,132 +1,148 @@
 import { useCallback } from 'react';
-import { signIn, signOut } from "@auth/create/react";
 import { authClient } from "@/lib/auth-client";
 import { useAuth as useBetterAuthContext } from "@/auth/AuthProvider";
 
+/**
+ * Custom hook for authentication operations.
+ * Uses Better Auth for all authentication in Vercel serverless environment.
+ * 
+ * @example
+ * const { signInWithCredentials, signOut } = useAuth();
+ * 
+ * // Sign in
+ * const result = await signInWithCredentials({ email, password });
+ * if (result.ok) {
+ *   // Success - redirect or update UI
+ * }
+ */
 function useAuth() {
   const callbackUrl = typeof window !== 'undefined' 
     ? new URLSearchParams(window.location.search).get('callbackUrl')
     : null;
 
-  // Check if Better Auth is enabled - try to use Better Auth context, fallback if not available
-  let useBetterAuthSystem = false;
-  let refreshBetterAuth = () => {};
-  
-  try {
-    const betterAuth = useBetterAuthContext();
-    useBetterAuthSystem = !!betterAuth;
-    refreshBetterAuth = betterAuth?.refresh || (() => {});
-  } catch {
-    // Better Auth not available, use Auth.js fallback
-    useBetterAuthSystem = false;
-  }
+  const { refresh: refreshAuth } = useBetterAuthContext();
 
   const signInWithCredentials = useCallback(async (options) => {
-    if (useBetterAuthSystem) {
-      // Use Better Auth
-      try {
-        await authClient.signIn.email({
-          email: options.email,
-          password: options.password,
-          callbackUrl: callbackUrl ?? options.callbackUrl ?? "/",
-        });
-        await refreshBetterAuth();
-        return { ok: true, url: callbackUrl ?? options.callbackUrl ?? "/" };
-      } catch (error) {
+    try {
+      const { data, error } = await authClient.signIn.email({
+        email: options.email,
+        password: options.password,
+      });
+      
+      if (error) {
         return { error: error?.message || "Failed to sign in" };
       }
+      
+      await refreshAuth();
+      const redirectUrl = callbackUrl ?? options.callbackUrl ?? "/";
+      
+      if (options.redirect !== false) {
+        window.location.href = redirectUrl;
+      }
+      
+      return { ok: true, url: redirectUrl, data };
+    } catch (error) {
+      return { error: error?.message || "Failed to sign in" };
     }
-    
-    // Fallback to Auth.js
-    return signIn("credentials-signin", {
-      ...options,
-      callbackUrl: callbackUrl ?? options.callbackUrl
-    });
-  }, [callbackUrl, useBetterAuthSystem, refreshBetterAuth])
+  }, [callbackUrl, refreshAuth]);
 
   const signUpWithCredentials = useCallback(async (options) => {
-    if (useBetterAuthSystem) {
-      // Use Better Auth
-      try {
-        await authClient.signUp.email({
-          name: options.name,
-          email: options.email,
-          password: options.password,
-          callbackUrl: callbackUrl ?? options.callbackUrl ?? "/",
-        });
-        await refreshBetterAuth();
-        return { ok: true, url: callbackUrl ?? options.callbackUrl ?? "/" };
-      } catch (error) {
+    try {
+      const { data, error } = await authClient.signUp.email({
+        name: options.name || "",
+        email: options.email,
+        password: options.password,
+      });
+      
+      if (error) {
         return { error: error?.message || "Failed to sign up" };
       }
-    }
-    
-    // Fallback to Auth.js
-    return signIn("credentials-signup", {
-      ...options,
-      callbackUrl: callbackUrl ?? options.callbackUrl
-    });
-  }, [callbackUrl, useBetterAuthSystem, refreshBetterAuth])
-
-  const signInWithGoogle = useCallback((options) => {
-    if (useBetterAuthSystem) {
-      // Better Auth OAuth
-      return authClient.signIn.oauth({
-        provider: "google",
-        callbackUrl: callbackUrl ?? options.callbackUrl ?? "/",
-      });
-    }
-    
-    // Fallback to Auth.js
-    return signIn("google", {
-      ...options,
-      callbackUrl: callbackUrl ?? options.callbackUrl
-    });
-  }, [callbackUrl, useBetterAuthSystem]);
-  
-  const signInWithFacebook = useCallback((options) => {
-    if (useBetterAuthSystem) {
-      return authClient.signIn.oauth({
-        provider: "facebook",
-        callbackUrl: callbackUrl ?? options.callbackUrl ?? "/",
-      });
-    }
-    return signIn("facebook", options);
-  }, [callbackUrl, useBetterAuthSystem]);
-  
-  const signInWithTwitter = useCallback((options) => {
-    if (useBetterAuthSystem) {
-      return authClient.signIn.oauth({
-        provider: "twitter",
-        callbackUrl: callbackUrl ?? options.callbackUrl ?? "/",
-      });
-    }
-    return signIn("twitter", options);
-  }, [callbackUrl, useBetterAuthSystem]);
-
-  const handleSignOut = useCallback(async (options) => {
-    if (useBetterAuthSystem) {
-      // Use Better Auth
-      await authClient.signOut.all();
-      await refreshBetterAuth();
-      if (options?.redirect !== false) {
-        window.location.href = options?.callbackUrl || "/";
+      
+      await refreshAuth();
+      const redirectUrl = callbackUrl ?? options.callbackUrl ?? "/";
+      
+      if (options.redirect !== false) {
+        window.location.href = redirectUrl;
       }
-      return { ok: true };
+      
+      return { ok: true, url: redirectUrl, data };
+    } catch (error) {
+      return { error: error?.message || "Failed to sign up" };
     }
-    
-    // Fallback to Auth.js
-    return signOut(options);
-  }, [useBetterAuthSystem, refreshBetterAuth]);
+  }, [callbackUrl, refreshAuth]);
+
+  const signInWithGitHub = useCallback(async (options = {}) => {
+    try {
+      await authClient.signIn.social({
+        provider: "github",
+        callbackURL: callbackUrl ?? options.callbackUrl ?? "/",
+      });
+      return { ok: true };
+    } catch (error) {
+      return { error: error?.message || "Failed to sign in with GitHub" };
+    }
+  }, [callbackUrl]);
+
+  const signInWithGoogle = useCallback(async (options = {}) => {
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: callbackUrl ?? options.callbackUrl ?? "/",
+      });
+      return { ok: true };
+    } catch (error) {
+      return { error: error?.message || "Failed to sign in with Google" };
+    }
+  }, [callbackUrl]);
+  
+  const signInWithFacebook = useCallback(async (options = {}) => {
+    try {
+      await authClient.signIn.social({
+        provider: "facebook",
+        callbackURL: callbackUrl ?? options.callbackUrl ?? "/",
+      });
+      return { ok: true };
+    } catch (error) {
+      return { error: error?.message || "Failed to sign in with Facebook" };
+    }
+  }, [callbackUrl]);
+  
+  const signInWithTwitter = useCallback(async (options = {}) => {
+    try {
+      await authClient.signIn.social({
+        provider: "twitter",
+        callbackURL: callbackUrl ?? options.callbackUrl ?? "/",
+      });
+      return { ok: true };
+    } catch (error) {
+      return { error: error?.message || "Failed to sign in with Twitter" };
+    }
+  }, [callbackUrl]);
+
+  const handleSignOut = useCallback(async (options = {}) => {
+    try {
+      await authClient.signOut();
+      await refreshAuth();
+      
+      if (options.redirect !== false) {
+        window.location.href = options.callbackUrl || "/";
+      }
+      
+      return { ok: true };
+    } catch (error) {
+      return { error: error?.message || "Failed to sign out" };
+    }
+  }, [refreshAuth]);
 
   return {
     signInWithCredentials,
     signUpWithCredentials,
+    signInWithGitHub,
     signInWithGoogle,
     signInWithFacebook,
     signInWithTwitter,
     signOut: handleSignOut,
-  }
+  };
 }
 
 export default useAuth;
