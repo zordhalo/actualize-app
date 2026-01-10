@@ -1,4 +1,4 @@
-import sql from "@/app/api/utils/sql";
+import { getDb } from "@/app/api/utils/mongodb";
 import { auth } from "@/auth";
 
 export async function GET() {
@@ -9,52 +9,65 @@ export async function GET() {
     }
 
     const userId = session.user.id;
+    const db = await getDb();
 
     // Get or create user profile
-    let profile = await sql`
-      SELECT user_id, full_name, age, focus_area, onboarding_completed, created_at
-      FROM user_profiles
-      WHERE user_id = ${userId}
-      LIMIT 1
-    `;
+    let profile = await db.collection('user_profiles').findOne({ user_id: userId });
 
-    if (profile.length === 0) {
+    if (!profile) {
       // Create profile if it doesn't exist
-      profile = await sql`
-        INSERT INTO user_profiles (user_id)
-        VALUES (${userId})
-        RETURNING user_id, full_name, age, focus_area, onboarding_completed, created_at
-      `;
+      const now = new Date();
+      const insertResult = await db.collection('user_profiles').insertOne({
+        user_id: userId,
+        full_name: null,
+        age: null,
+        focus_area: null,
+        onboarding_completed: false,
+        created_at: now,
+        updated_at: now,
+      });
+      profile = await db.collection('user_profiles').findOne({ _id: insertResult.insertedId });
     }
 
-    // Get assessment stats
-    const stats = await sql`
-      SELECT 
-        COUNT(*) as total_assessments,
-        AVG(overall_score) as average_score,
-        MAX(overall_score) as best_score,
-        MAX(spiritual_score) as best_spiritual,
-        MAX(physical_score) as best_physical,
-        MAX(mental_score) as best_mental,
-        MAX(educational_score) as best_educational,
-        MAX(financial_score) as best_financial
-      FROM assessments
-      WHERE user_id = ${userId}
-    `;
+    // Get assessment stats using MongoDB aggregation
+    const statsResult = await db.collection('assessments').aggregate([
+      { $match: { user_id: userId } },
+      {
+        $group: {
+          _id: null,
+          total_assessments: { $sum: 1 },
+          average_score: { $avg: '$overall_score' },
+          best_score: { $max: '$overall_score' },
+          best_spiritual: { $max: '$spiritual_score' },
+          best_physical: { $max: '$physical_score' },
+          best_mental: { $max: '$mental_score' },
+          best_educational: { $max: '$educational_score' },
+          best_financial: { $max: '$financial_score' },
+        },
+      },
+    ]).toArray();
 
-    const userProfile = profile[0];
-    const userStats = stats[0];
+    const userStats = statsResult[0] || {
+      total_assessments: 0,
+      average_score: null,
+      best_score: null,
+      best_spiritual: null,
+      best_physical: null,
+      best_mental: null,
+      best_educational: null,
+      best_financial: null,
+    };
 
     return Response.json({
       profile: {
-        fullName: userProfile.full_name,
-        age: userProfile.age,
-        focusArea: userProfile.focus_area,
-        onboardingCompleted: userProfile.onboarding_completed,
-        memberSince: userProfile.created_at,
+        fullName: profile.full_name || null,
+        age: profile.age || null,
+        focusArea: profile.focus_area || null,
+        onboardingCompleted: profile.onboarding_completed || false,
+        memberSince: profile.created_at,
       },
       stats: {
-        totalAssessments: parseInt(userStats.total_assessments) || 0,
+        totalAssessments: userStats.total_assessments || 0,
         averageScore: userStats.average_score
           ? Math.round(userStats.average_score)
           : 0,
@@ -84,69 +97,57 @@ export async function PUT(request) {
     const body = await request.json();
     const { fullName, age, focusArea, onboardingCompleted } = body;
 
-    const setClauses = [];
-    const values = [];
-    let paramCount = 1;
+    const updateData = {};
+    const now = new Date();
 
     if (typeof fullName === "string") {
-      setClauses.push(`full_name = $${paramCount++}`);
-      values.push(fullName);
+      updateData.full_name = fullName;
     }
 
     if (typeof age === "number") {
-      setClauses.push(`age = $${paramCount++}`);
-      values.push(age);
+      updateData.age = age;
     }
 
     if (typeof focusArea === "string") {
-      setClauses.push(`focus_area = $${paramCount++}`);
-      values.push(focusArea);
+      updateData.focus_area = focusArea;
     }
 
     if (typeof onboardingCompleted === "boolean") {
-      setClauses.push(`onboarding_completed = $${paramCount++}`);
-      values.push(onboardingCompleted);
+      updateData.onboarding_completed = onboardingCompleted;
     }
 
-    if (setClauses.length === 0) {
+    if (Object.keys(updateData).length === 0) {
       return Response.json(
         { error: "No valid fields to update" },
         { status: 400 },
       );
     }
 
-    setClauses.push(`updated_at = NOW()`);
-    values.push(session.user.id);
+    updateData.updated_at = now;
 
-    const query = `
-      INSERT INTO user_profiles (user_id, ${setClauses
-        .map((_, i) => {
-          if (i === 0 && fullName !== undefined) return "full_name";
-          if ((i === 0 && fullName === undefined) || i === 1) {
-            if (age !== undefined) return "age";
-            if (focusArea !== undefined) return "focus_area";
-            if (onboardingCompleted !== undefined)
-              return "onboarding_completed";
-          }
-          return "";
-        })
-        .filter(Boolean)
-        .join(", ")})
-      VALUES ($${paramCount}, ${values.map((_, i) => `$${i + 1}`).join(", ")})
-      ON CONFLICT (user_id) 
-      DO UPDATE SET ${setClauses.join(", ")}
-      RETURNING user_id, full_name, age, focus_area, onboarding_completed
-    `;
-
-    const result = await sql(query, values);
+    const db = await getDb();
+    const result = await db.collection('user_profiles').findOneAndUpdate(
+      { user_id: session.user.id },
+      {
+        $set: updateData,
+        $setOnInsert: {
+          user_id: session.user.id,
+          created_at: now,
+        },
+      },
+      {
+        upsert: true,
+        returnDocument: 'after',
+      }
+    );
 
     return Response.json({
       success: true,
       profile: {
-        fullName: result[0].full_name,
-        age: result[0].age,
-        focusArea: result[0].focus_area,
-        onboardingCompleted: result[0].onboarding_completed,
+        fullName: result.full_name || null,
+        age: result.age || null,
+        focusArea: result.focus_area || null,
+        onboardingCompleted: result.onboarding_completed || false,
       },
     });
   } catch (error) {
