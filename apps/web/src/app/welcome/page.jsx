@@ -1,58 +1,68 @@
 import { Link } from "react-router";
+import actualizeArrowsIcon from "../../../../../brand/actualizeIconArrowsNBG.png";
 
 export default function WelcomePage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-starry text-brand-white">
       <div className="max-w-xl mx-auto px-5 py-16">
-        <h1 className="text-5xl font-semibold text-[#d90428] mb-4 font-montserrat">
+        {/* Brand Logo/Title */}
+        <h1 className="text-6xl font-display font-bold text-brand-red mb-2 uppercase tracking-wider">
           Actualize
         </h1>
         
-        <p className="text-lg text-[#999] leading-7 mb-10 font-montserrat">
+        {/* Script tagline */}
+        <p className="text-2xl font-script text-brand-white mb-8">
+          Energy Over Everything
+        </p>
+
+        <p className="text-lg text-[#999] leading-7 mb-10 font-body">
           You're on a journey to becoming your best self across every area of life.
         </p>
 
+        {/* Feature cards */}
         <div className="space-y-6 mb-10">
-          <div>
-            <div className="w-12 h-12 rounded-full bg-[#d90428] flex items-center justify-center mb-3 text-2xl">
+          <div className="card-brand">
+            <div className="w-12 h-12 rounded-full bg-brand-red flex items-center justify-center mb-3 text-2xl">
               ✨
             </div>
-            <h3 className="text-base font-semibold text-white mb-2 font-montserrat">
+            <h3 className="text-lg font-display font-semibold text-brand-white mb-2 uppercase tracking-wide">
               Comprehensive Assessment
             </h3>
-            <p className="text-sm text-[#999] leading-6 font-montserrat">
+            <p className="text-sm text-[#999] leading-6 font-body">
               Measure your wellness across five key dimensions with scientifically-grounded questions
             </p>
           </div>
 
-          <div>
-            <div className="w-12 h-12 rounded-full bg-[#22c55e] flex items-center justify-center mb-3 text-2xl">
-              📊
+          <div className="card-brand">
+            <div className="w-12 h-12 rounded-full bg-[#22c55e] flex items-center justify-center mb-3">
+              <img src={actualizeArrowsIcon} alt="Track Progress" className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-semibold text-white mb-2 font-montserrat">
+            <h3 className="text-lg font-display font-semibold text-brand-white mb-2 uppercase tracking-wide">
               Track Your Progress
             </h3>
-            <p className="text-sm text-[#999] leading-6 font-montserrat">
+            <p className="text-sm text-[#999] leading-6 font-body">
               Monitor your growth over time with detailed analytics and insights
             </p>
           </div>
 
-          <div>
+          <div className="card-brand">
             <div className="w-12 h-12 rounded-full bg-[#3b82f6] flex items-center justify-center mb-3 text-2xl">
               🎯
             </div>
-            <h3 className="text-base font-semibold text-white mb-2 font-montserrat">
+            <h3 className="text-lg font-display font-semibold text-brand-white mb-2 uppercase tracking-wide">
               Actionable Recommendations
             </h3>
-            <p className="text-sm text-[#999] leading-6 font-montserrat">
-              Get personalized tips to improve in each dimension
+            <p className="text-sm text-[#999] leading-6 font-body">
+              Get personalized tips to improve{" "}
+              <span className="text-brand-lime font-semibold">(IN ALL AREAS OF LIFE)</span>
             </p>
           </div>
         </div>
 
+        {/* CTA Buttons */}
         <Link
           to="/account/signup"
-          className="w-full bg-[#d90428] hover:bg-[#b80320] text-white rounded-2xl py-4 px-6 font-semibold text-base flex items-center justify-center gap-2 transition-colors mb-4"
+          className="btn-brand w-full mb-4"
         >
           Create Account
           <span className="text-xl">→</span>
@@ -60,7 +70,7 @@ export default function WelcomePage() {
 
         <Link
           to="/account/signin"
-          className="w-full bg-transparent border border-[#333] hover:border-[#555] text-white rounded-2xl py-4 px-6 font-semibold text-base flex items-center justify-center transition-colors"
+          className="btn-secondary w-full"
         >
           Sign In
         </Link>
@@ -68,4 +78,3 @@ export default function WelcomePage() {
     </div>
   );
 }
-

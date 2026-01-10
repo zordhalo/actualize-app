@@ -1,9 +1,180 @@
+/* Google Fonts - Actualize Brand Typography */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Allura&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* CSS Custom Properties - Actualize Brand */
+:root {
+  /* Brand Colors */
+  --brand-red: #CC0000;
+  --brand-red-dark: #A30000;
+  --brand-red-light: #DC143C;
+  --brand-black: #000000;
+  --brand-charcoal: #1A1A1A;
+  --brand-charcoal-light: #2B2B2B;
+  --brand-white: #FFFFFF;
+  --brand-lime: #ADFF2F;
+  
+  /* Typography */
+  --font-display: 'Oswald', sans-serif;
+  --font-body: 'Montserrat', sans-serif;
+  --font-script: 'Allura', cursive;
+}
+
 @layer base {
+  /* Base body styling */
+  body {
+    @apply bg-brand-black text-brand-white;
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Remove outlines on interactive elements */
   input, textarea, select, button {
     @apply outline-none focus:outline-none;
   }
+
+  /* Display headings - Oswald */
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    @apply font-bold tracking-wide;
+  }
+}
+
+@layer components {
+  /* Brand CTA Button - Bold Red */
+  .btn-brand {
+    @apply bg-brand-red hover:bg-brand-red-dark text-brand-white;
+    @apply rounded-xl py-4 px-6 font-semibold text-base;
+    @apply flex items-center justify-center gap-2 transition-colors;
+    @apply uppercase tracking-wider;
+    font-family: var(--font-display);
+  }
+
+  /* Secondary Button - Outlined */
+  .btn-secondary {
+    @apply bg-transparent border border-brand-charcoal-light hover:border-brand-lime;
+    @apply text-brand-white rounded-xl py-4 px-6 font-semibold text-base;
+    @apply flex items-center justify-center transition-colors;
+    font-family: var(--font-body);
+  }
+
+  /* Brand Card */
+  .card-brand {
+    @apply bg-brand-charcoal rounded-2xl p-6;
+  }
+
+  /* Display Text - All Caps Condensed */
+  .text-display {
+    font-family: var(--font-display);
+    @apply uppercase tracking-wider font-bold;
+  }
+
+  /* Script/Accent Text */
+  .text-script {
+    font-family: var(--font-script);
+  }
+
+  /* Lime Accent Text */
+  .text-accent {
+    @apply text-brand-lime font-bold uppercase;
+    font-family: var(--font-display);
+  }
+
+  /* Italic Emphasis (Red) */
+  .text-emphasis {
+    @apply text-brand-red italic;
+    font-family: var(--font-body);
+  }
+
+  /* Starry Background */
+  .bg-starry {
+    @apply bg-brand-black relative overflow-hidden;
+  }
+
+  .bg-starry::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), transparent),
+      radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 160px 120px, rgba(255,255,255,0.3), transparent),
+      radial-gradient(2px 2px at 200px 50px, rgba(255,255,255,0.25), transparent),
+      radial-gradient(1px 1px at 250px 160px, rgba(255,255,255,0.35), transparent),
+      radial-gradient(2px 2px at 300px 90px, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 350px 200px, rgba(255,255,255,0.4), transparent),
+      radial-gradient(2px 2px at 400px 130px, rgba(255,255,255,0.15), transparent),
+      radial-gradient(1px 1px at 450px 60px, rgba(255,255,255,0.3), transparent),
+      radial-gradient(2px 2px at 500px 180px, rgba(255,255,255,0.25), transparent);
+    background-size: 550px 250px;
+    background-repeat: repeat;
+    pointer-events: none;
+    animation: twinkle 4s ease-in-out infinite alternate;
+  }
+
+  .bg-starry > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@layer utilities {
+  /* Font utilities */
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  .font-script {
+    font-family: var(--font-script);
+  }
+}
+
+/* Animations */
+@keyframes twinkle {
+  0% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+/* Scrollbar styling for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--brand-charcoal);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--brand-charcoal-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
 }

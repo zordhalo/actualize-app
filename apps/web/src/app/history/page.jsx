@@ -3,7 +3,9 @@ import { Link, useNavigate } from "react-router";
 import { useSession } from "@auth/create/react";
 import useUser from "@/utils/useUser";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import actualizeIcon from "../../../../../brand/actualizeLogoClearBg.avif";
+import actualizeIcon from "../../../../../brand/actualizeLogoNBG.avif";
+import actualizeArrowsIcon from "../../../../../brand/actualizeIconArrowsNBG.png";
+import actualizeBoltIcon from "../../../../../brand/actualizeIconBoltNBG.png";
 
 function HistoryContent() {
   const { status } = useSession();
@@ -199,15 +201,15 @@ function HistoryContent() {
         <div className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#333] px-4 py-3">
           <div className="max-w-2xl mx-auto flex justify-around">
             <Link to="/dashboard" className="flex flex-col items-center gap-1 text-[#999] hover:text-white">
-              <img src={actualizeIcon} alt="Home" className="w-5 h-5" />
+              <img src={actualizeIcon} alt="Home" className="w-10 h-10" />
               <span className="text-xs font-montserrat">Home</span>
             </Link>
             <Link to="/history" className="flex flex-col items-center gap-1 text-[#d90428]">
-              <span className="text-xl">📊</span>
+              <img src={actualizeArrowsIcon} alt="History" className="w-10 h-10" />
               <span className="text-xs font-montserrat">History</span>
             </Link>
             <Link to="/profile" className="flex flex-col items-center gap-1 text-[#999] hover:text-white">
-              <span className="text-xl">👤</span>
+              <img src={actualizeBoltIcon} alt="Profile" className="w-10 h-10" />
               <span className="text-xs font-montserrat">Profile</span>
             </Link>
           </div>

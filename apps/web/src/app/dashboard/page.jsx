@@ -4,7 +4,9 @@ import { useSession } from "@auth/create/react";
 import useUser from "@/utils/useUser";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import actualizeLogo from "../../../../../brand/actualizeFullTextwLogo.png";
-import actualizeIcon from "../../../../../brand/actualizeLogoClearBg.avif";
+import actualizeIcon from "../../../../../brand/actualizeLogoNBG.avif";
+import actualizeArrowsIcon from "../../../../../brand/actualizeIconArrowsNBG.png";
+import actualizeBoltIcon from "../../../../../brand/actualizeIconBoltNBG.png";
 
 function DashboardContent() {
   const { data: session } = useSession();
@@ -33,10 +35,10 @@ function DashboardContent() {
   };
 
   const getScoreTier = (score) => {
-    if (score >= 80) return { label: "Thriving", color: "#3b82f6" };
-    if (score >= 60) return { label: "Good", color: "#22c55e" };
-    if (score >= 40) return { label: "Fair", color: "#eab308" };
-    return { label: "Needs Attention", color: "#ef4444" };
+    if (score >= 80) return { label: "THRIVING", color: "#d4af37" };
+    if (score >= 60) return { label: "GOOD", color: "#22c55e" };
+    if (score >= 40) return { label: "FAIR", color: "#f59e0b" };
+    return { label: "NEEDS ATTENTION", color: "#ef4444" };
   };
 
   const getDimensionIcon = (dimension) => {
@@ -52,38 +54,40 @@ function DashboardContent() {
 
   if (loading || userLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
-        <div className="w-8 h-8 border-4 border-[#d90428] border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-brand-black">
+        <div className="w-8 h-8 border-4 border-brand-red border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-brand-black text-brand-white">
       <div className="max-w-2xl mx-auto px-5 py-8">
+        {/* Header */}
         <div className="mb-8">
           <img 
             src={actualizeLogo} 
             alt="Actualize" 
             className="h-9"
           />
-          <p className="text-sm text-[#999] mt-1 font-montserrat">
+          <p className="text-sm text-[#999] mt-1 font-body">
             Your Wellness Dashboard
           </p>
         </div>
 
         {!latestAssessment ? (
           <>
-            <div className="bg-[#1a1a1a] rounded-2xl p-6 mb-5">
-              <h2 className="text-xl font-semibold text-white mb-3 font-montserrat">
+            {/* Empty State - Start Journey */}
+            <div className="card-brand mb-5">
+              <h2 className="text-2xl font-display font-bold text-brand-white mb-3 uppercase tracking-wide">
                 Start Your Journey
               </h2>
-              <p className="text-sm text-[#999] leading-6 mb-6 font-montserrat">
+              <p className="text-sm text-[#999] leading-6 mb-6 font-body">
                 Take your first wellness assessment to understand your current state across five key dimensions.
               </p>
               <Link
                 to="/assessment-intro"
-                className="w-full bg-[#d90428] hover:bg-[#b80320] text-white rounded-2xl py-4 px-6 font-semibold text-base flex items-center justify-center gap-2 transition-colors"
+                className="btn-brand w-full"
               >
                 <span className="text-lg">+</span>
                 Begin Assessment
@@ -92,14 +96,15 @@ function DashboardContent() {
           </>
         ) : (
           <>
-            <div className="bg-[#1a1a1a] rounded-2xl p-6 mb-5">
+            {/* Latest Score Card */}
+            <div className="card-brand mb-5">
               <div className="flex justify-between items-center mb-5">
-                <h2 className="text-xl font-semibold text-white font-montserrat">
+                <h2 className="text-xl font-display font-bold text-brand-white uppercase tracking-wide">
                   Latest Score
                 </h2>
                 <Link
                   to="/assessment-intro"
-                  className="bg-[#d90428] hover:bg-[#b80320] px-4 py-2 rounded-xl text-xs font-semibold text-white transition-colors"
+                  className="bg-brand-red hover:bg-brand-red-dark px-4 py-2 rounded-xl text-xs font-display font-semibold text-brand-white transition-colors uppercase tracking-wider"
                 >
                   Retake
                 </Link>
@@ -107,20 +112,20 @@ function DashboardContent() {
 
               <div className="text-center mb-5">
                 <div
-                  className="text-6xl font-semibold font-montserrat"
+                  className="text-7xl font-display font-bold"
                   style={{ color: getScoreTier(latestAssessment.overallScore).color }}
                 >
                   {latestAssessment.overallScore}
                 </div>
                 <div
-                  className="text-base font-semibold mt-2 font-montserrat"
+                  className="text-lg font-display font-semibold mt-2 uppercase tracking-wider"
                   style={{ color: getScoreTier(latestAssessment.overallScore).color }}
                 >
                   {getScoreTier(latestAssessment.overallScore).label}
                 </div>
               </div>
 
-              <p className="text-sm text-[#999] text-center leading-5 font-montserrat">
+              <p className="text-sm text-[#999] text-center leading-5 font-body">
                 {latestAssessment.overallScore >= 80
                   ? "You're excelling—your balanced focus is paying off."
                   : latestAssessment.overallScore >= 60
@@ -131,27 +136,28 @@ function DashboardContent() {
               </p>
             </div>
 
-            <div className="bg-[#1a1a1a] rounded-2xl p-5 mb-5">
-              <h3 className="text-base font-semibold text-white mb-4 font-montserrat">
+            {/* Dimension Breakdown */}
+            <div className="card-brand mb-5">
+              <h3 className="text-lg font-display font-semibold text-brand-white mb-4 uppercase tracking-wide">
                 Dimension Breakdown
               </h3>
               {Object.entries(latestAssessment.scores).map(([dimension, score], index, arr) => (
                 <div
                   key={dimension}
-                  className={`flex justify-between items-center py-3 ${index < arr.length - 1 ? "border-b border-[#333]" : ""}`}
+                  className={`flex justify-between items-center py-3 ${index < arr.length - 1 ? "border-b border-surface-light" : ""}`}
                 >
                   <div className="flex items-center flex-1">
                     <span className="text-xl mr-3">{getDimensionIcon(dimension)}</span>
-                    <span className="text-sm text-white font-montserrat">{dimension}</span>
+                    <span className="text-sm text-brand-white font-body">{dimension}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span
-                      className="text-lg font-semibold font-montserrat"
+                      className="text-lg font-display font-semibold"
                       style={{ color: getScoreTier(score).color }}
                     >
                       {score}
                     </span>
-                    <div className="w-16 h-2 bg-[#333] rounded-full overflow-hidden">
+                    <div className="w-16 h-2 bg-surface-light rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{
@@ -165,13 +171,14 @@ function DashboardContent() {
               ))}
             </div>
 
+            {/* Progress History Link */}
             <Link
               to="/history"
-              className="bg-[#1a1a1a] hover:bg-[#222] rounded-2xl p-5 flex items-center justify-between transition-colors"
+              className="card-brand flex items-center justify-between hover:bg-surface-light transition-colors"
             >
               <div className="flex items-center gap-3">
-                <span className="text-[#d90428] text-xl">📈</span>
-                <span className="text-base font-semibold text-white font-montserrat">
+                <span className="text-brand-red text-xl">📈</span>
+                <span className="text-base font-display font-semibold text-brand-white uppercase tracking-wide">
                   View Progress History
                 </span>
               </div>
@@ -180,20 +187,20 @@ function DashboardContent() {
           </>
         )}
 
-        {/* Navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#333] px-4 py-3">
+        {/* Bottom Navigation */}
+        <div className="fixed bottom-0 left-0 right-0 bg-surface border-t border-surface-light px-4 py-3">
           <div className="max-w-2xl mx-auto flex justify-around">
-            <Link to="/dashboard" className="flex flex-col items-center gap-1 text-[#d90428]">
+            <Link to="/dashboard" className="flex flex-col items-center gap-1 text-brand-red">
               <img src={actualizeIcon} alt="Home" className="w-5 h-5" />
-              <span className="text-xs font-montserrat">Home</span>
+              <span className="text-xs font-body">Home</span>
             </Link>
-            <Link to="/history" className="flex flex-col items-center gap-1 text-[#999] hover:text-white">
-              <span className="text-xl">📊</span>
-              <span className="text-xs font-montserrat">History</span>
+            <Link to="/history" className="flex flex-col items-center gap-1 text-[#999] hover:text-brand-white">
+              <img src={actualizeArrowsIcon} alt="History" className="w-5 h-5" />
+              <span className="text-xs font-body">History</span>
             </Link>
-            <Link to="/profile" className="flex flex-col items-center gap-1 text-[#999] hover:text-white">
-              <span className="text-xl">👤</span>
-              <span className="text-xs font-montserrat">Profile</span>
+            <Link to="/profile" className="flex flex-col items-center gap-1 text-[#999] hover:text-brand-white">
+              <img src={actualizeBoltIcon} alt="Profile" className="w-5 h-5" />
+              <span className="text-xs font-body">Profile</span>
             </Link>
           </div>
         </div>

@@ -71,13 +71,6 @@ export default function AssessmentScreen() {
       ...prev,
       [currentQuestion.id]: rating,
     }));
-
-    // Auto-advance to next question
-    if (currentQuestionIndex < allQuestions.length - 1) {
-      setTimeout(() => {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
-      }, 200);
-    }
   };
 
   const handlePrevious = () => {

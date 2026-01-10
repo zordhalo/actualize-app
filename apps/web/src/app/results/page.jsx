@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router";
 import { useSession } from "@auth/create/react";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import actualizeIcon from "../../../../../brand/actualizeLogoClearBg.avif";
+import actualizeIcon from "../../../../../brand/actualizeLogoNBG.avif";
 
 function ResultsContent() {
   const { status } = useSession();
@@ -179,7 +179,7 @@ function ResultsContent() {
           to="/dashboard"
           className="w-full bg-[#d90428] hover:bg-[#b80320] text-white rounded-2xl py-4 px-6 font-semibold text-base flex items-center justify-center gap-2 transition-colors mb-3"
         >
-          <img src={actualizeIcon} alt="Home" className="w-5 h-5" />
+          <img src={actualizeIcon} alt="Home" className="w-10 h-10" />
           Go to Dashboard
         </Link>
 
