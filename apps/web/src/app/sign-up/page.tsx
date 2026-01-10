@@ -11,7 +11,7 @@ import { CLERK_AFTER_SIGN_UP_PATH, CLERK_SIGN_IN_PATH } from '@/lib/clerk';
 export default function SignUpPage() {
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-starry p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-lg">
         <SignUp
           appearance={{
             elements: {

@@ -11,6 +11,8 @@
     },
     "routeIdToServerBundleId": {
       "page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "sign-in/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "sign-up/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "account/logout/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "account/signin/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "account/signup/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
@@ -35,6 +37,24 @@
         "parentId": "root",
         "file": "src/app/page.jsx",
         "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "sign-in/page": {
+        "id": "sign-in/page",
+        "parentId": "root",
+        "file": "src/app/sign-in/page.tsx",
+        "path": "sign-in/*",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "sign-up/page": {
+        "id": "sign-up/page",
+        "parentId": "root",
+        "file": "src/app/sign-up/page.tsx",
+        "path": "sign-up/*",
         "config": {
           "runtime": "nodejs"
         }
@@ -165,6 +185,18 @@
         "file": "./page.jsx",
         "index": true
       },
+      "sign-in/page": {
+        "id": "sign-in/page",
+        "parentId": "root",
+        "file": "./sign-in/page.tsx",
+        "path": "sign-in/*"
+      },
+      "sign-up/page": {
+        "id": "sign-up/page",
+        "parentId": "root",
+        "file": "./sign-up/page.tsx",
+        "path": "sign-up/*"
+      },
       "account/logout/page": {
         "id": "account/logout/page",
         "parentId": "root",
@@ -249,6 +281,14 @@
           {
             "index": true,
             "file": "./page.jsx"
+          },
+          {
+            "path": "sign-in/*",
+            "file": "./sign-in/page.tsx"
+          },
+          {
+            "path": "sign-up/*",
+            "file": "./sign-up/page.tsx"
           },
           {
             "path": "account/logout",
