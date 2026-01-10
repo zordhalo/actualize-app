@@ -3,9 +3,11 @@ import { Link, useNavigate } from "react-router";
 import { useSession } from "@auth/create/react";
 import useUser from "@/utils/useUser";
 import useAuth from "@/utils/useAuth";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import actualizeIcon from "../../../../../brand/actualizeLogoClearBg.avif";
 
-export default function ProfilePage() {
-  const { data: session, status } = useSession();
+function ProfileContent() {
+  const { status } = useSession();
   const { data: user, loading: userLoading } = useUser();
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -14,12 +16,8 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (status === "loading") return;
-    if (!session?.user) {
-      navigate("/account/signin?callbackUrl=/profile");
-      return;
-    }
     fetchProfile();
-  }, [session, status, navigate]);
+  }, [status]);
 
   const fetchProfile = async () => {
     try {
@@ -151,7 +149,7 @@ export default function ProfilePage() {
         <div className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#333] px-4 py-3">
           <div className="max-w-2xl mx-auto flex justify-around">
             <Link to="/dashboard" className="flex flex-col items-center gap-1 text-[#999] hover:text-white">
-              <span className="text-xl">🏠</span>
+              <img src={actualizeIcon} alt="Home" className="w-5 h-5" />
               <span className="text-xs font-montserrat">Home</span>
             </Link>
             <Link to="/history" className="flex flex-col items-center gap-1 text-[#999] hover:text-white">
@@ -170,3 +168,11 @@ export default function ProfilePage() {
   );
 }
 
+// Wrap with ProtectedRoute to require authentication
+export default function ProfilePage() {
+  return (
+    <ProtectedRoute>
+      <ProfileContent />
+    </ProtectedRoute>
+  );
+}

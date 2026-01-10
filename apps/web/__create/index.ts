@@ -181,14 +181,28 @@ if (process.env.AUTH_SECRET) {
                 (account) => account.provider === 'credentials'
               );
               const accountPassword = matchingAccount?.password;
+              
+              // Debug: log account info
+              console.log(`[auth] Found ${user.accounts.length} accounts for user: ${email}`);
+              console.log(`[auth] Account providers: ${user.accounts.map(a => a.provider).join(', ')}`);
+              console.log(`[auth] Has password in account: ${!!accountPassword}`);
+              if (accountPassword) {
+                console.log(`[auth] Password hash starts with: ${accountPassword.substring(0, 20)}...`);
+              }
+              
               if (!accountPassword) {
                 console.error(`[auth] No credentials account found for user: ${email}`);
                 return null;
               }
 
-              const isValid = await verify(accountPassword, password);
-              if (!isValid) {
-                console.error(`[auth] Password verification failed for user: ${email}`);
+              try {
+                const isValid = await verify(accountPassword, password);
+                if (!isValid) {
+                  console.error(`[auth] Password verification failed for user: ${email}`);
+                  return null;
+                }
+              } catch (verifyError) {
+                console.error(`[auth] Password verify threw error for user: ${email}`, verifyError);
                 return null;
               }
 
@@ -237,8 +251,9 @@ if (process.env.AUTH_SECRET) {
             try {
               const existingUser = await adapter.getUserByEmail(email);
               if (existingUser) {
-                // User with this email already exists - throw error
-                throw new Error('EmailCreateAccount');
+                // User with this email already exists - return null (causes CredentialsSignin error)
+                console.error(`[auth] Signup failed: email already exists: ${email}`);
+                return null;
               }
 
               // User doesn't exist - create new user
@@ -263,12 +278,8 @@ if (process.env.AUTH_SECRET) {
               
               return newUser;
             } catch (error) {
-              // Re-throw Auth.js error codes
-              if (error instanceof Error && error.message === 'EmailCreateAccount') {
-                throw error;
-              }
               console.error('Database signup failed:', error);
-              throw new Error('Callback');
+              return null;
             }
           },
         }),

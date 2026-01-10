@@ -1,23 +1,20 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { useSession } from "@auth/create/react";
 import useUser from "@/utils/useUser";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import actualizeLogo from "../../../../../brand/actualizeFullTextwLogo.png";
+import actualizeIcon from "../../../../../brand/actualizeLogoClearBg.avif";
 
-export default function DashboardPage() {
-  const { data: session, status } = useSession();
+function DashboardContent() {
+  const { data: session } = useSession();
   const { data: user, loading: userLoading } = useUser();
-  const navigate = useNavigate();
   const [latestAssessment, setLatestAssessment] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (status === "loading") return;
-    if (!session?.user) {
-      navigate("/welcome");
-      return;
-    }
     fetchLatestAssessment();
-  }, [session, status, navigate]);
+  }, []);
 
   const fetchLatestAssessment = async () => {
     try {
@@ -53,7 +50,7 @@ export default function DashboardPage() {
     return icons[dimension] || "⭐";
   };
 
-  if (loading || userLoading || status === "loading") {
+  if (loading || userLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
         <div className="w-8 h-8 border-4 border-[#d90428] border-t-transparent rounded-full animate-spin" />
@@ -65,9 +62,11 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <div className="max-w-2xl mx-auto px-5 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-white font-montserrat">
-            Actualize
-          </h1>
+          <img 
+            src={actualizeLogo} 
+            alt="Actualize" 
+            className="h-9"
+          />
           <p className="text-sm text-[#999] mt-1 font-montserrat">
             Your Wellness Dashboard
           </p>
@@ -89,21 +88,6 @@ export default function DashboardPage() {
                 <span className="text-lg">+</span>
                 Begin Assessment
               </Link>
-            </div>
-
-            <div className="bg-[#1a1a1a] rounded-2xl p-5">
-              <h3 className="text-base font-semibold text-white mb-4 font-montserrat">
-                Five Dimensions of Wellness
-              </h3>
-              {["Spiritual", "Physical", "Mental", "Educational", "Financial"].map((dim, index) => (
-                <div
-                  key={dim}
-                  className={`flex items-center py-3 ${index < 4 ? "border-b border-[#333]" : ""}`}
-                >
-                  <span className="text-2xl mr-3">{getDimensionIcon(dim)}</span>
-                  <span className="text-sm text-white font-montserrat">{dim}</span>
-                </div>
-              ))}
             </div>
           </>
         ) : (
@@ -200,7 +184,7 @@ export default function DashboardPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#333] px-4 py-3">
           <div className="max-w-2xl mx-auto flex justify-around">
             <Link to="/dashboard" className="flex flex-col items-center gap-1 text-[#d90428]">
-              <span className="text-xl">🏠</span>
+              <img src={actualizeIcon} alt="Home" className="w-5 h-5" />
               <span className="text-xs font-montserrat">Home</span>
             </Link>
             <Link to="/history" className="flex flex-col items-center gap-1 text-[#999] hover:text-white">
@@ -219,3 +203,11 @@ export default function DashboardPage() {
   );
 }
 
+// Wrap with ProtectedRoute to require authentication
+export default function DashboardPage() {
+  return (
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
+  );
+}

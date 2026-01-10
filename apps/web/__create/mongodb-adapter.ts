@@ -107,13 +107,6 @@ export default function MongoDBAdapter(
 
     async createUser(user: Omit<AdapterUser, 'id'>) {
       const db = await getDb();
-      
-      // Check if user with this email already exists (duplicate check)
-      const existingUser = await db.collection('users').findOne({ email: user.email });
-      if (existingUser) {
-        throw new Error('User with this email already exists');
-      }
-      
       const result = await db.collection('users').insertOne({
         name: user.name,
         email: user.email,

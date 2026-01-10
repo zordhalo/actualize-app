@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useSession } from "@auth/create/react";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
-export default function AssessmentPage() {
-  const { data: session, status } = useSession();
+function AssessmentContent() {
+  const { status } = useSession();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -13,12 +14,8 @@ export default function AssessmentPage() {
 
   useEffect(() => {
     if (status === "loading") return;
-    if (!session?.user) {
-      navigate("/account/signin?callbackUrl=/assessment");
-      return;
-    }
     fetchQuestions();
-  }, [session, status, navigate]);
+  }, [status]);
 
   const fetchQuestions = async () => {
     try {
@@ -43,9 +40,6 @@ export default function AssessmentPage() {
   const handleResponse = (rating) => {
     const currentQuestion = allQuestions[currentQuestionIndex];
     setResponses((prev) => ({ ...prev, [currentQuestion.id]: rating }));
-    if (currentQuestionIndex < allQuestions.length - 1) {
-      setTimeout(() => setCurrentQuestionIndex(currentQuestionIndex + 1), 200);
-    }
   };
 
   const handlePrevious = () => {
@@ -172,12 +166,12 @@ export default function AssessmentPage() {
           {currentQuestion.text}
         </h2>
 
-        <div className="mb-8">
+        <div className="mb-8 md:max-w-lg md:mx-auto">
           <div className="flex justify-between mb-3">
             <span className="text-xs text-[#999] font-montserrat">Strongly Disagree</span>
             <span className="text-xs text-[#999] font-montserrat">Strongly Agree</span>
           </div>
-          <div className="flex justify-between gap-2">
+          <div className="flex justify-between md:justify-center md:gap-6 gap-2">
             {[1, 2, 3, 4, 5].map((rating) => (
               <button
                 key={rating}
@@ -251,3 +245,11 @@ export default function AssessmentPage() {
   );
 }
 
+// Wrap with ProtectedRoute to require authentication
+export default function AssessmentPage() {
+  return (
+    <ProtectedRoute>
+      <AssessmentContent />
+    </ProtectedRoute>
+  );
+}

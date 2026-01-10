@@ -1,17 +1,10 @@
 import { Link, useNavigate } from "react-router";
 import { useSession } from "@auth/create/react";
-import { useEffect } from "react";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
-export default function AssessmentIntroPage() {
-  const { data: session, status } = useSession();
+function AssessmentIntroContent() {
+  const { status } = useSession();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (status === "loading") return;
-    if (!session?.user) {
-      navigate("/account/signin?callbackUrl=/assessment-intro");
-    }
-  }, [session, status, navigate]);
 
   const dimensions = [
     { name: "Spiritual", icon: "✨", description: "Purpose, values, connection" },
@@ -97,3 +90,11 @@ export default function AssessmentIntroPage() {
   );
 }
 
+// Wrap with ProtectedRoute to require authentication
+export default function AssessmentIntroPage() {
+  return (
+    <ProtectedRoute>
+      <AssessmentIntroContent />
+    </ProtectedRoute>
+  );
+}
