@@ -16,7 +16,7 @@ export default function SignUpPage() {
           appearance={{
             elements: {
               rootBox: 'w-full',
-              card: 'rounded-2xl bg-surface p-8 shadow-xl border border-surface-light',
+              card: 'w-full rounded-2xl bg-surface p-8 shadow-xl border border-surface-light',
               headerTitle: 'text-4xl font-display font-bold text-brand-red uppercase tracking-wider text-center',
               headerSubtitle: 'text-sm text-[#999] font-body text-center',
               formButtonPrimary: 'bg-brand-red hover:bg-brand-red/90 text-white font-display uppercase tracking-wide',

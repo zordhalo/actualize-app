@@ -38,6 +38,18 @@ export function ClerkAuthProvider({ children }: { children: React.ReactNode }) {
       signInUrl={CLERK_SIGN_IN_PATH}
       signUpUrl={CLERK_SIGN_UP_PATH}
       afterSignOutUrl="/"
+      localization={{
+        signIn: {
+          start: {
+            title: 'Sign in to Actualize',
+          },
+        },
+        signUp: {
+          start: {
+            title: 'Create your account',
+          },
+        },
+      }}
     >
       {children}
     </ClerkProvider>
