@@ -33,8 +33,7 @@ function AssessmentContent() {
         });
         setAllQuestions(flatQuestions);
               console.log('[Assessment] Successfully loaded', flatQuestions.length, 'questions');
-      }
-          } else {
+         } else {
             console.error('Failed to fetch questions:', response.status, response.statusText);
             // Log more details for debugging
             const errorText = await response.text();
