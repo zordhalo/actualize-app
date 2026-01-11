@@ -7,12 +7,7 @@
                   "destination": "/api/:path*"
                 }
         ],
-    "functions": {
-          "api/**/*.ts": {
-                  "runtime": "nodejs20.x"
-                }
-        },
-  
+    
   "headers": [
     {
       "source": "/api/(.*)",
