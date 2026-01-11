@@ -101,6 +101,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Invalid responses format' });
       }
 
+      // Validate responses exist and aren't empty
+      const responseCount = Object.keys(responses).length;
+      if (responseCount === 0) {
+        return res.status(400).json({ error: 'No responses provided. Please answer all questions.' });
+      }
+
+      // Validate all response values are numbers 1-5
+      for (const [questionId, response] of Object.entries(responses)) {
+        if (typeof response !== 'number' || response < 1 || response > 5) {
+          return res.status(400).json({ error: `Invalid response value for question ${questionId}` });
+        }
+      }
+
+      // Quick validation: Check if response count is in reasonable range to fail fast
+      // Full validation happens after we determine expected question count
+      const STATIC_QUESTION_COUNT = Object.keys(STATIC_QUESTION_MAP).length;
+      const MAX_REASONABLE_RESPONSE_COUNT = STATIC_QUESTION_COUNT * 2; // Allow some buffer for custom questions
+      if (responseCount > MAX_REASONABLE_RESPONSE_COUNT) {
+        return res.status(400).json({ 
+          error: `Too many responses provided. Expected around ${STATIC_QUESTION_COUNT} questions.` 
+        });
+      }
+
       // Calculate scores for each dimension
       const dimensions = ['Spiritual', 'Physical', 'Mental', 'Educational', 'Financial'];
 
@@ -128,6 +151,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         questionMap = STATIC_QUESTION_MAP;
       }
 
+      // Validate response count matches expected questions
+      const expectedQuestionCount = questions && questions.length > 0 
+        ? questions.length 
+        : Object.keys(STATIC_QUESTION_MAP).length;
+      
+      if (responseCount !== expectedQuestionCount) {
+        return res.status(400).json({ 
+          error: `Expected ${expectedQuestionCount} responses, got ${responseCount}. Please answer all questions.` 
+        });
+      }
+
+      // Validate all response keys correspond to valid questions
+      for (const questionId of Object.keys(responses)) {
+        if (!questionMap[questionId]) {
+          return res.status(400).json({ 
+            error: `Invalid question ID: ${questionId}` 
+          });
+        }
+      }
+
       // Initialize dimension scores
       const dimensionScores: Record<string, { raw: number; count: number }> = {
         Spiritual: { raw: 0, count: 0 },
@@ -141,7 +184,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       Object.entries(responses).forEach(([questionId, response]) => {
         const question = questionMap[questionId];
         const responseNum = response as number;
-        if (question && responseNum >= 1 && responseNum <= 5) {
+        if (question) {
           const score = question.isReverseCoded ? 6 - responseNum : responseNum;
           dimensionScores[question.dimension].raw += score;
           dimensionScores[question.dimension].count += 1;
