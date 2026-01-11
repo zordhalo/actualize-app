@@ -12,7 +12,7 @@ import { nextPublicProcessEnv } from './plugins/nextPublicProcessEnv';
 import { restart } from './plugins/restart';
 import { restartEnvFileChange } from './plugins/restartEnvFileChange';
 
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
   // Keep them available via import.meta.env.NEXT_PUBLIC_*
   envPrefix: ['NEXT_PUBLIC_', 'VITE_'],
   optimizeDeps: {
@@ -69,7 +69,14 @@ export default defineConfig({
     // Force Vite to bundle CommonJS modules that don't work well with ESM
     noExternal: ['react-idle-timer'],
   },
-  build: {},
+  build: {
+    // Use custom server entrypoint for SSR builds
+    rollupOptions: isSsrBuild
+      ? {
+          input: './server/app.ts',
+        }
+      : undefined,
+  },
   server: {
     allowedHosts: true,
     host: '0.0.0.0',
@@ -88,4 +95,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

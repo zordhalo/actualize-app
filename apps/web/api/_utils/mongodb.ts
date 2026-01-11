@@ -74,4 +74,8 @@ export function getDatabaseName(): string {
   return databaseName;
 }
 
+export async function getClient(): Promise<MongoClient> {
+  return getClientPromise();
+}
+
 export default getClientPromise;

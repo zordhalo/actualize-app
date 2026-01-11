@@ -75,21 +75,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (handleCors(req, res)) return;
 
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ 
+      error: 'Method not allowed',
+      message: 'Only GET requests are supported'
+    });
   }
 
   try {
     // Try to fetch from database first
     const db = await getDb();
+    
+    // Query with proper handling for is_active field
     const questions = await db.collection('questions')
-      .find({ is_active: true })
+      .find({
+        $or: [{ is_active: true }, { is_active: { $exists: false } }]
+      })
       .sort({ dimension: 1, order_index: 1 })
       .toArray();
 
     // If no questions in database, return static questions
     if (!questions || questions.length === 0) {
       console.log('[questions] No questions in database, using static fallback');
-      return res.json({ questions: STATIC_QUESTIONS });
+      return res.status(200).json({ 
+        questions: STATIC_QUESTIONS,
+        source: 'static',
+        count: Object.values(STATIC_QUESTIONS).flat().length
+      });
     }
 
     // Group questions by dimension
@@ -101,23 +112,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       Financial: [],
     };
 
-    questions.forEach((q) => {
+    questions.forEach((q: any) => {
       const dimension = q.dimension as keyof GroupedQuestions;
       if (grouped[dimension]) {
         grouped[dimension].push({
           id: q._id.toString(),
           text: q.question_text,
-          isReverseCoded: q.is_reverse_coded,
-          order: q.order_index,
+          isReverseCoded: q.is_reverse_coded || false,
+          order: q.order_index || 0,
         });
       }
     });
 
-    return res.json({ questions: grouped });
+    return res.status(200).json({ 
+      questions: grouped,
+      source: 'database',
+      count: questions.length,
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
-    console.error('Error fetching questions from database:', error);
+    console.error('[questions] Error fetching from database:', error);
     // Fallback to static questions on any error
-    console.log('[questions] Database error, using static fallback');
-    return res.json({ questions: STATIC_QUESTIONS });
+    return res.status(200).json({ 
+      questions: STATIC_QUESTIONS,
+      source: 'static-fallback',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      count: Object.values(STATIC_QUESTIONS).flat().length
+    });
   }
 }

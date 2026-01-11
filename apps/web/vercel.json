@@ -1,13 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm build",
-    "rewrites": [
-          {
-                  "source": "/api/:path*",
-                  "destination": "/api/:path*"
-                }
-        ],
-    
+  "outputDirectory": "build/client",
+  
   "headers": [
     {
       "source": "/api/(.*)",
