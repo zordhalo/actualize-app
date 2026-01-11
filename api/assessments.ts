@@ -101,6 +101,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Invalid responses format' });
       }
 
+      // Validate responses exist and aren't empty
+      const responseCount = Object.keys(responses).length;
+      if (responseCount === 0) {
+        return res.status(400).json({ error: 'No responses provided. Please answer all questions.' });
+      }
+
+      // Validate all response values are numbers 1-5
+      for (const [questionId, response] of Object.entries(responses)) {
+        if (typeof response !== 'number' || response < 1 || response > 5) {
+          return res.status(400).json({ error: `Invalid response value for question ${questionId}` });
+        }
+      }
+
       // Calculate scores for each dimension
       const dimensions = ['Spiritual', 'Physical', 'Mental', 'Educational', 'Financial'];
 
@@ -126,6 +139,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       } else {
         // Use static question map for fallback
         questionMap = STATIC_QUESTION_MAP;
+      }
+
+      // Validate response count matches expected questions
+      const expectedQuestionCount = questions && questions.length > 0 
+        ? questions.length 
+        : Object.keys(STATIC_QUESTION_MAP).length;
+      
+      if (responseCount !== expectedQuestionCount) {
+        return res.status(400).json({ 
+          error: `Expected ${expectedQuestionCount} responses, got ${responseCount}. Please answer all questions.` 
+        });
       }
 
       // Initialize dimension scores

@@ -9,6 +9,7 @@ function AssessmentContent() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
   const [allQuestions, setAllQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState({});
@@ -43,6 +44,7 @@ function AssessmentContent() {
       console.error("Error fetching questions:", error);
     } finally {
       setLoading(false);
+      setIsLoadingQuestions(false);
     }
   };
 
@@ -83,11 +85,14 @@ function AssessmentContent() {
         });
         navigate(`/results?${params.toString()}`);
       } else {
-        console.error("Failed to submit assessment");
+        const errorData = await response.json();
+        console.error("Failed to submit assessment:", errorData.error || "Unknown error");
+        alert(errorData.error || "Failed to submit assessment. Please try again.");
         setSubmitting(false);
       }
     } catch (error) {
       console.error("Error submitting assessment:", error);
+      alert("An error occurred while submitting. Please try again.");
       setSubmitting(false);
     }
   };
@@ -129,7 +134,9 @@ function AssessmentContent() {
   const currentQuestion = allQuestions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / allQuestions.length) * 100;
   const isAnswered = responses[currentQuestion.id] !== undefined;
-  const allAnswered = Object.keys(responses).length === allQuestions.length;
+  const allAnswered = !isLoadingQuestions && 
+                     allQuestions.length > 0 && 
+                     Object.keys(responses).length === allQuestions.length;
 
   return (
     <div className="min-h-screen bg-brand-black text-brand-white flex flex-col">
@@ -145,6 +152,10 @@ function AssessmentContent() {
           <span className="text-sm font-display font-semibold text-[#999] uppercase tracking-wide">
             {currentQuestionIndex + 1} / {allQuestions.length}
           </span>
+        </div>
+        {/* Progress indicator */}
+        <div className="text-xs text-[#999] text-center mb-1 font-body">
+          {Object.keys(responses).length} of {allQuestions.length} answered
         </div>
         {/* Progress bar */}
         <div className="h-1 bg-surface-light rounded-full overflow-hidden">
@@ -245,7 +256,9 @@ function AssessmentContent() {
                   : "bg-surface-light text-[#666] cursor-not-allowed"
               }`}
             >
-              {submitting ? (
+              {isLoadingQuestions ? (
+                "Loading..."
+              ) : submitting ? (
                 <div className="w-5 h-5 border-2 border-brand-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 "Complete"
