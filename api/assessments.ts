@@ -114,6 +114,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
 
+      // Quick validation: Check if response count is in reasonable range
+      // Full validation happens after we determine expected question count
+      const STATIC_QUESTION_COUNT = Object.keys(STATIC_QUESTION_MAP).length;
+      if (responseCount > STATIC_QUESTION_COUNT * 2) {
+        // If responses are way more than expected, fail fast
+        return res.status(400).json({ 
+          error: `Too many responses provided. Expected around ${STATIC_QUESTION_COUNT} questions.` 
+        });
+      }
+
       // Calculate scores for each dimension
       const dimensions = ['Spiritual', 'Physical', 'Mental', 'Educational', 'Financial'];
 
@@ -165,7 +175,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       Object.entries(responses).forEach(([questionId, response]) => {
         const question = questionMap[questionId];
         const responseNum = response as number;
-        if (question && responseNum >= 1 && responseNum <= 5) {
+        if (question) {
           const score = question.isReverseCoded ? 6 - responseNum : responseNum;
           dimensionScores[question.dimension].raw += score;
           dimensionScores[question.dimension].count += 1;

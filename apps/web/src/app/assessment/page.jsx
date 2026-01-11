@@ -113,7 +113,7 @@ function AssessmentContent() {
     return colors[dimension] || "#CC0000";
   };
 
-  if (loading || status === "loading") {
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-brand-black">
         <div className="w-8 h-8 border-4 border-brand-red border-t-transparent rounded-full animate-spin" />
