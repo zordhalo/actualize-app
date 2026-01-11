@@ -2,6 +2,26 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install",
   "ignoreCommand": "exit 0",
+  "buildCommand": "cd apps/web && pnpm run build",
+  "outputDirectory": "apps/web/build/client",
+  
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 30
+    }
+  },
+  
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/apps/web/build/client/$1"
+    }
+  ],
   
   "headers": [
     {
