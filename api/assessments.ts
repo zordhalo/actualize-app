@@ -114,11 +114,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
 
-      // Quick validation: Check if response count is in reasonable range
+      // Quick validation: Check if response count is in reasonable range to fail fast
       // Full validation happens after we determine expected question count
       const STATIC_QUESTION_COUNT = Object.keys(STATIC_QUESTION_MAP).length;
-      if (responseCount > STATIC_QUESTION_COUNT * 2) {
-        // If responses are way more than expected, fail fast
+      const MAX_REASONABLE_RESPONSE_COUNT = STATIC_QUESTION_COUNT * 2; // Allow some buffer for custom questions
+      if (responseCount > MAX_REASONABLE_RESPONSE_COUNT) {
         return res.status(400).json({ 
           error: `Too many responses provided. Expected around ${STATIC_QUESTION_COUNT} questions.` 
         });
@@ -160,6 +160,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ 
           error: `Expected ${expectedQuestionCount} responses, got ${responseCount}. Please answer all questions.` 
         });
+      }
+
+      // Validate all response keys correspond to valid questions
+      for (const questionId of Object.keys(responses)) {
+        if (!questionMap[questionId]) {
+          return res.status(400).json({ 
+            error: `Invalid question ID: ${questionId}` 
+          });
+        }
       }
 
       // Initialize dimension scores
