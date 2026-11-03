@@ -1,5 +1,7 @@
 # Actualize App
 
+[![MCP servers live](https://whobuildsagents.com/badge/advancelabs.dev.svg)](https://whobuildsagents.com/advancelabs.dev)
+
 > Assessment and questions platform with web and mobile applications
 
 ## 📦 Project Structure
